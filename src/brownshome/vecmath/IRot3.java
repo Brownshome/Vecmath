@@ -5,8 +5,12 @@ public class IRot3 extends IVec4 implements Rot3 {
 		super(x, y, z, w);
 	}
 	
-	public IRot3(Vec3 axis, double angle) {
-		assert false; //TODO
+	public static IRot3 fromAxisAngle(Vec3 axis, double angle) {
+		angle = angle / 2;
+		double cos = Math.cos(angle);
+		double sin = Math.sin(angle);
+		
+		return new IRot3(axis.x() * sin, axis.y() * sin, axis.z() * sin, cos);
 	}
 	
 	public IRot3() {
