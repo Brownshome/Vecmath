@@ -1,6 +1,9 @@
 plugins {
 	id 'java-library'
+	id 'com.zyxist.chainsaw'
 }
+
+javaModule.name = 'brownshome.vecmath'
 
 sourceSets {
 	main.java.srcDirs = ['src']
