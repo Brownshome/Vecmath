@@ -1,6 +1,6 @@
 package brownshome.vecmath;
 
-/** An interface representing a 2D vector. This can be used as a type representing a Vec2 that may be edited by the creator by by noone else. */
+/** An interface representing a 2D vector. This can be used as a type representing a Vec2 that may be edited by the creator by by no-one else. */
 public interface Vec2 {
 	double x();
 	double y();

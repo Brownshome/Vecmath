@@ -92,6 +92,17 @@ public class MVec3 implements Vec3 {
 	}
 
 	/**
+	 * Performs a linear interpolation between this and other.
+	 * this = this * (1-t) + other * t
+	 * @param other The other vector to interpolate to
+	 * @param t The time factor
+	 */
+	public void lerp(Vec3 other, double t) {
+		scale(1.0 - t);
+		scaleAdd(other, t);
+	}
+
+	/**
 	 * Sets this to be this + vec * scale
 	 * @param vec The vector to add
 	 * @param scale The number to scale it by

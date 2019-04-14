@@ -1,6 +1,6 @@
 package brownshome.vecmath;
 
-/** An interface representing a 3D vector. This can be used as a type representing a Vec3 that may be edited by the creator by by noone else. */
+/** An interface representing a 3D vector. This can be used as a type representing a Vec3 that may be edited by the creator by by no-one else. */
 public interface Vec3 {
 	double x();
 	double y();

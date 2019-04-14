@@ -13,6 +13,14 @@ public class IRot3 extends IVec4 implements Rot3 {
 		return new IRot3(axis.x() * sin, axis.y() * sin, axis.z() * sin, cos);
 	}
 	
+	/**
+	 * Converts a vec3 into a quaternion. This quaternion is a 'pure' quaternion, and not normalised unless v is normalised
+	 * @param v The input vector
+	 */
+	public IRot3(Vec3 v) {
+		this(v.x(), v.y(), v.z(), 0);
+	}
+	
 	public IRot3() {
 		this(0, 0, 0, 1);
 	}
