@@ -1,6 +1,8 @@
 package brownshome.vecmath;
 
 public class IRot3 extends IVec4 implements Rot3 {
+	public static final IRot3 IDENTITY = new IRot3(0, 0, 0, 1);
+
 	public IRot3(double x, double y, double z, double w) {
 		super(x, y, z, w);
 	}
@@ -19,10 +21,6 @@ public class IRot3 extends IVec4 implements Rot3 {
 	 */
 	public IRot3(Vec3 v) {
 		this(v.x(), v.y(), v.z(), 0);
-	}
-	
-	public IRot3() {
-		this(0, 0, 0, 1);
 	}
 	
 	public IRot3(Rot3 r) {
