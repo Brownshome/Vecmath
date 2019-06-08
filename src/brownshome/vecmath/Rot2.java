@@ -29,4 +29,20 @@ public interface Rot2 extends Vec2 {
 	
 	double sin();
 	double cos();
+
+	/**
+	 * Returns an immutable version of this object.
+	 **/
+	@Override
+	default IRot2 immutable() {
+		return new IRot2(this);
+	}
+
+	/**
+	 * Returns an mutable version of this object. This object's changes will effect the original if it was mutable.
+	 **/
+	@Override
+	default MRot2 mutable() {
+		return new MRot2(this);
+	}
 }

@@ -29,4 +29,12 @@ public class IVec2 implements Vec2 {
 	public String toString() {
 		return String.format("(%.3f, %.3f)", x(), y());
 	}
+
+	/**
+	 * Returns an immutable version of this object.
+	 **/
+	@Override
+	public IVec2 immutable() {
+		return this;
+	}
 }

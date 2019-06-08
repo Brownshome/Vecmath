@@ -35,4 +35,12 @@ public class IVec3 implements Vec3 {
 	public String toString() {
 		return String.format("(%.3f, %.3f, %.3f)", x(), y(), z());
 	}
+
+	/**
+	 * Returns an immutable version of this object.
+	 **/
+	@Override
+	public IVec3 immutable() {
+		return this;
+	}
 }

@@ -31,4 +31,12 @@ public class IRot2 extends IVec2 implements Rot2 {
 	public String toString() {
 		return String.format("(%.3f, %.3f)", x(), y());
 	}
+
+	/**
+	 * Returns an immutable version of this object.
+	 **/
+	@Override
+	public IRot2 immutable() {
+		return this;
+	}
 }

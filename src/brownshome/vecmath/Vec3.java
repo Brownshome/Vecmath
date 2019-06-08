@@ -49,4 +49,18 @@ public interface Vec3 {
 	default boolean exactEquals(Vec3 other) {
 		return x() == other.x() && y() == other.y() && z() == other.z();
 	}
+
+	/**
+	 * Returns an immutable version of this object.
+	 **/
+	default IVec3 immutable() {
+		return new IVec3(this);
+	}
+
+	/**
+	 * Returns an mutable version of this object. This object's changes will effect the original if it was mutable.
+	 **/
+	default MVec3 mutable() {
+		return new MVec3(this);
+	}
 }

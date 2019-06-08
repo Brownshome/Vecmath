@@ -31,4 +31,12 @@ public class IRot3 extends IVec4 implements Rot3 {
 	public String toString() {
 		return String.format("(%.3f, %.3f, %.3f, %.3f)", x(), y(), z(), w());
 	}
+
+	/**
+	 * Returns an immutable version of this object.
+	 **/
+	@Override
+	public IRot3 immutable() {
+		return this;
+	}
 }

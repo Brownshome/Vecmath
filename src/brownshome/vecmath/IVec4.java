@@ -43,4 +43,12 @@ public class IVec4 implements Vec4 {
 	public String toString() {
 		return String.format("(%.3f, %.3f, %.3f, %.3f)", x(), y(), z(), w());
 	}
+
+	/**
+	 * Returns an immutable version of this object.
+	 **/
+	@Override
+	public IVec4 immutable() {
+		return this;
+	}
 }

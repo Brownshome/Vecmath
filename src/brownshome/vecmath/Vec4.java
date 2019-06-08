@@ -51,4 +51,18 @@ public interface Vec4 {
 	default boolean exactEquals(Vec4 other) {
 		return x() == other.x() && y() == other.y() && z() == other.z() && w() == other.w();
 	}
+
+	/**
+	 * Returns an immutable version of this object.
+	 **/
+	default IVec4 immutable() {
+		return new IVec4(this);
+	}
+
+	/**
+	 * Returns an mutable version of this object. This object's changes will effect the original if it was mutable.
+	 **/
+	default MVec4 mutable() {
+		return new MVec4(this);
+	}
 }

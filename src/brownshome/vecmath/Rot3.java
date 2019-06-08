@@ -38,4 +38,20 @@ public interface Rot3 extends Vec4 {
 			{ 2 * (x() * z() - y() * w()), 2 * (y() * z() + x() * w()), 1 - 2 * (x2 + y2)           }
 		};
 	}
+
+	/**
+	 * Returns an immutable version of this object.
+	 **/
+	@Override
+	default IRot3 immutable() {
+		return new IRot3(this);
+	}
+
+	/**
+	 * Returns an mutable version of this object. This object's changes will effect the original if it was mutable.
+	 **/
+	@Override
+	default MRot3 mutable() {
+		return new MRot3(this);
+	}
 }

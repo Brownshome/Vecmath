@@ -48,7 +48,7 @@ public class MRot3 extends MVec4 implements Rot3 {
 	/**
 	 * Performs a spherical linear interpolation between this and q, driven by t.
 	 * This is set to the result.
-	 * @param q The rotation to interpolate to.
+	 * @param other The rotation to interpolate to.
 	 * @param t The amount to interpolate by. This must be in the range [0,1]
 	 */
 	public void slerp(Rot3 other, double t) {
@@ -88,7 +88,7 @@ public class MRot3 extends MVec4 implements Rot3 {
 	/**
 	 * Performs a normalised linear interpolation between this and q, driven by t.
 	 * This is set to the result.
-	 * @param q The rotation to interpolate to.
+	 * @param other The rotation to interpolate to.
 	 * @param t The amount to interpolate by. This must be in the range [0,1]
 	 */
 	public void nLerp(Rot3 other, double t) {
@@ -119,5 +119,13 @@ public class MRot3 extends MVec4 implements Rot3 {
 	
 	public void invert() {
 		w(-w());
+	}
+
+	/**
+	 * Returns an mutable version of this object. This object's changes will effect the original if it was mutable.
+	 **/
+	@Override
+	public MRot3 mutable() {
+		return this;
 	}
 }

@@ -121,4 +121,12 @@ public class MVec3 implements Vec3 {
 		angle = Math.acos(angle);
 		return angle;
 	}
+
+	/**
+	 * Returns an mutable version of this object. This object's changes will effect the original if it was mutable.
+	 **/
+	@Override
+	public MVec3 mutable() {
+		return this;
+	}
 }

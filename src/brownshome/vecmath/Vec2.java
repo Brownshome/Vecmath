@@ -47,4 +47,18 @@ public interface Vec2 {
 	default boolean exactEquals(Vec2 other) {
 		return x() == other.x() && y() == other.y();
 	}
+
+	/**
+	 * Returns an immutable version of this object.
+	 **/
+	default IVec2 immutable() {
+		return new IVec2(this);
+	}
+
+	/**
+	 * Returns an mutable version of this object. This object's changes will effect the original if it was mutable.
+	 **/
+	default MVec2 mutable() {
+		return new MVec2(this);
+	}
 }
