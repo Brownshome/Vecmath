@@ -56,7 +56,17 @@ public interface Vec2 {
 	}
 
 	/**
-	 * Returns an mutable version of this object. This object's changes will effect the original if it was mutable.
+	 * Gets an angle between this vector and the given vector in radians. This angle will be positive, and always in the
+	 * range [0, pi]
+	 **/
+	default double angle(Vec2 vec) {
+		double angle = this.dot(vec) / (this.length() * vec.length());
+		angle = Math.acos(angle);
+		return angle;
+	}
+
+	/**
+	 * Returns an mutable copy of this object.
 	 **/
 	default MVec2 mutable() {
 		return new MVec2(this);

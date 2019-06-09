@@ -9,8 +9,11 @@ public interface Rot2 extends Vec2 {
 		v.set(x, y);
 	}
 	
-	/** Finds arg[ other / this ] or the angle from this rotation to
-	 * the other rotation */
+	/**
+	 * Finds arg[ other / this ] or the angle from this rotation to
+	 * the other rotation. This differs from {@link #angle(Vec2)} in that
+	 * it can return negative values for the angle. The result is in the range [ -pi, pi ]
+	 **/
 	default double angleTo(Rot2 o) {
 		//Looks terrible, but only uses one atan call.
 		//It is a simplification of arg[(o.x + i * o.y) / (x + i * y)]
@@ -39,7 +42,7 @@ public interface Rot2 extends Vec2 {
 	}
 
 	/**
-	 * Returns an mutable version of this object. This object's changes will effect the original if it was mutable.
+	 * Returns an mutable copy of this object.
 	 **/
 	@Override
 	default MRot2 mutable() {

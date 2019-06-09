@@ -104,19 +104,4 @@ public class MVec2 implements Vec2 {
 	public void negate() {
 		set(-x(), -y());
 	}
-	
-	/** Gets an angle between this vector and the given vector in radians*/
-	public double angle(Vec2 vec) {
-		double angle = this.dot(vec) / (this.length() * vec.length());
-		angle = Math.acos(angle);
-		return angle;
-	}
-
-	/**
-	 * Returns an mutable version of this object. This object's changes will effect the original if it was mutable.
-	 **/
-	@Override
-	public MVec2 mutable() {
-		return this;
-	}
 }

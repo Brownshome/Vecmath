@@ -9,8 +9,13 @@ javaModule.name = 'brownshome.vecmath'
 group = 'brownshome'
 version = 'alpha'
 
+repositories {
+	mavenCentral()
+}
+
 sourceSets {
-	main.java.srcDirs = ['src']
+	main.java.srcDirs = ['src/main']
+	test.java.srcDirs = ['src/test']
 }
 
 task sourcesJar(type: Jar) {
@@ -26,4 +31,13 @@ publishing {
 			artifact sourcesJar
 		}
 	}
+}
+
+dependencies {
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.1.0'
+	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.1.0'
+}
+
+test {
+	useJUnitPlatform()
 }

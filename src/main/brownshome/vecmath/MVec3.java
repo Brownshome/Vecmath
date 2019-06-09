@@ -114,19 +114,4 @@ public class MVec3 implements Vec3 {
 	public void negate() {
 		set(-x(), -y(), -z());
 	}
-	
-	/** Gets an angle between this vector and the given vector in radians*/
-	public double angle(Vec3 vec) {
-		double angle = this.dot(vec) / (this.length() * vec.length());
-		angle = Math.acos(angle);
-		return angle;
-	}
-
-	/**
-	 * Returns an mutable version of this object. This object's changes will effect the original if it was mutable.
-	 **/
-	@Override
-	public MVec3 mutable() {
-		return this;
-	}
 }

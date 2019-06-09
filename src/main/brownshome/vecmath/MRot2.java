@@ -39,12 +39,4 @@ public class MRot2 extends MVec2 implements Rot2 {
 	public void cos(double cos) {
 		x(cos);
 	}
-
-	/**
-	 * Returns an mutable version of this object. This object's changes will effect the original if it was mutable.
-	 **/
-	@Override
-	public MRot2 mutable() {
-		return this;
-	}
 }

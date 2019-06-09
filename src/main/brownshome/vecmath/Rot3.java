@@ -18,13 +18,20 @@ public interface Rot3 extends Vec4 {
 		conj.multiplyLeft(point);
 		conj.multiplyLeft(this);
 
-		v.set(point.x(), point.y(), point.z());
+		v.set(conj.x(), conj.y(), conj.z());
 	}
 	
-	/** Finds the angle between two quaternions */
+	/**
+	 * Finds the smallest positive angle between two quaternions. This is the smallest amount of rotation in radians that
+	 * is needed to move from one orientation to the other.
+	 **/
 	default double angleTo(Rot3 o) {
-		double dot = dot(o);
-		return Math.acos(2 * dot * dot - 1);
+		MRot3 difference = mutable();
+		difference.conj();
+		difference.multiplyLeft(o);
+
+		// ABS to clamp the result to pi
+		return 2.0 * Math.acos(Math.abs(o.w()));
 	}
 
 	/** Returns a matrix R such as R * p = p' */
@@ -48,7 +55,7 @@ public interface Rot3 extends Vec4 {
 	}
 
 	/**
-	 * Returns an mutable version of this object. This object's changes will effect the original if it was mutable.
+	 * Returns an mutable copy of this object.
 	 **/
 	@Override
 	default MRot3 mutable() {

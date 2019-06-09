@@ -59,8 +59,15 @@ public interface Vec4 {
 		return new IVec4(this);
 	}
 
+	/** Gets an angle between this vector and the given vector in radians*/
+	default double angle(Vec4 vec) {
+		double angle = this.dot(vec) / (this.length() * vec.length());
+		angle = Math.acos(angle);
+		return angle;
+	}
+
 	/**
-	 * Returns an mutable version of this object. This object's changes will effect the original if it was mutable.
+	 * Returns an mutable copy of this object.
 	 **/
 	default MVec4 mutable() {
 		return new MVec4(this);

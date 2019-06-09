@@ -120,12 +120,4 @@ public class MRot3 extends MVec4 implements Rot3 {
 	public void invert() {
 		w(-w());
 	}
-
-	/**
-	 * Returns an mutable version of this object. This object's changes will effect the original if it was mutable.
-	 **/
-	@Override
-	public MRot3 mutable() {
-		return this;
-	}
 }

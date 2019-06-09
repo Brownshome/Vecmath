@@ -2,7 +2,10 @@ package brownshome.vecmath;
 
 public class IVec3 implements Vec3 {
 	public static final IVec3 ZERO = new IVec3(0, 0, 0);
-	
+	public static final IVec3 X_AXIS = new IVec3(1, 0, 0);
+	public static final IVec3 Y_AXIS = new IVec3(0, 1, 0);
+	public static final IVec3 Z_AXIS = new IVec3(0, 0, 1);
+
 	private final double x, y, z;
 	
 	public IVec3(double x, double y, double z) {

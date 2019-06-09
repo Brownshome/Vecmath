@@ -2,7 +2,9 @@ package brownshome.vecmath;
 
 public class IVec2 implements Vec2 {
 	public static final IVec2 ZERO = new IVec2(0, 0);
-	
+	public static final IVec2 X_AXIS = new IVec2(1, 0);
+	public static final IVec2 Y_AXIS = new IVec2(0, 1);
+
 	private final double x, y;
 	
 	public IVec2(double x, double y) {
