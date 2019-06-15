@@ -105,7 +105,7 @@ public class MRot3 extends MVec4 implements Rot3 {
 	}
 
 	public void conj() {
-		set(-x(), -y(), -x(), w());
+		set(-x(), -y(), -z(), w());
 	}
 	
 	public MRot3(double x, double y, double z, double w) {
