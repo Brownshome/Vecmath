@@ -107,6 +107,19 @@ public class MVec3 implements Vec3 {
 	}
 
 	/**
+	 * Sets this vector to be the cross of the two inputs. This vector can safely be either, or both of the inputs.
+	 */
+	public void cross(Vec3 l, Vec3 r) {
+		double xc, yc, zc;
+
+		xc = l.y() * r.z() - l.z() * r.y();
+		yc = l.z() * r.x() - l.x() * r.z();
+		zc = l.x() * r.y() - l.y() * r.x();
+
+		set(xc, yc, zc);
+	}
+
+	/**
 	 * Sets this to be this + vec * scale
 	 * @param vec The vector to add
 	 * @param scale The number to scale it by
