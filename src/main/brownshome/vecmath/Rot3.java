@@ -11,7 +11,7 @@ public interface Rot3 extends Vec4 {
 		// Evaluate p` = qpq*
 
 		MRot3 conj = new MRot3(this);
-		conj.conj();
+		conj.invert();
 
 		Rot3 point = new IRot3(v);
 
@@ -27,7 +27,7 @@ public interface Rot3 extends Vec4 {
 	 **/
 	default double angleTo(Rot3 o) {
 		MRot3 difference = mutable();
-		difference.conj();
+		difference.invert();
 		difference.multiplyLeft(o);
 
 		// ABS to clamp the result to pi
@@ -50,7 +50,7 @@ public interface Rot3 extends Vec4 {
 	 * Returns an immutable version of this object.
 	 **/
 	@Override
-	default IRot3 immutable() {
+	default Rot3 immutable() {
 		return new IRot3(this);
 	}
 

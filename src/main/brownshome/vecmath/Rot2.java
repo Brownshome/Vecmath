@@ -37,7 +37,7 @@ public interface Rot2 extends Vec2 {
 	 * Returns an immutable version of this object.
 	 **/
 	@Override
-	default IRot2 immutable() {
+	default Rot2 immutable() {
 		return new IRot2(this);
 	}
 

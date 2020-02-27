@@ -7,6 +7,13 @@ public class MRot3 extends MVec4 implements Rot3 {
 	 */
 	private static final double SLERP_INTERPOLATE = 0.99995;
 
+	/**
+	 * Produces a quaternion that represents a rotation by the supplied axis angle combination.
+	 * @param axis The axis to rotate by
+	 * @param angle The angle to rotate by. Looking along the axis, this is clockwise in a right-handed coordinate system
+	 *              and counter-clockwise in a left-handed system.
+	 * @return A rotation representing the rotation by the axis-angle pair.
+	 */
 	public static MRot3 fromAxisAngle(Vec3 axis, double angle) {
 		angle = angle / 2;
 		double cos = Math.cos(angle);
@@ -104,7 +111,8 @@ public class MRot3 extends MVec4 implements Rot3 {
 		normalize();
 	}
 
-	public void conj() {
+	/** Sets this rotation to a rotation representing the opposite transformation. This is the same as the conjugate. */
+	public void invert() {
 		set(-x(), -y(), -z(), w());
 	}
 	
@@ -115,9 +123,5 @@ public class MRot3 extends MVec4 implements Rot3 {
 	/** The identity rotation */
 	public MRot3() {
 		this(0, 0, 0, 1);
-	}
-	
-	public void invert() {
-		w(-w());
 	}
 }

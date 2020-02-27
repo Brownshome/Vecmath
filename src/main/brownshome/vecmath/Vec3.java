@@ -53,7 +53,7 @@ public interface Vec3 {
 	/**
 	 * Returns an immutable version of this object.
 	 **/
-	default IVec3 immutable() {
+	default Vec3 immutable() {
 		return new IVec3(this);
 	}
 

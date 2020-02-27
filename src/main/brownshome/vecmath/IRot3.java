@@ -6,7 +6,14 @@ public class IRot3 extends IVec4 implements Rot3 {
 	public IRot3(double x, double y, double z, double w) {
 		super(x, y, z, w);
 	}
-	
+
+	/**
+	 * Produces a quaternion that represents a rotation by the supplied axis angle combination.
+	 * @param axis The axis to rotate by
+	 * @param angle The angle to rotate by. Looking along the axis, this is clockwise in a right-handed coordinate system
+	 *              and counter-clockwise in a left-handed system.
+	 * @return A rotation representing the rotation by the axis-angle pair.
+	 */
 	public static IRot3 fromAxisAngle(Vec3 axis, double angle) {
 		angle = angle / 2;
 		double cos = Math.cos(angle);

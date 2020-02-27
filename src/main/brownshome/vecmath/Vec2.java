@@ -51,7 +51,7 @@ public interface Vec2 {
 	/**
 	 * Returns an immutable version of this object.
 	 **/
-	default IVec2 immutable() {
+	default Vec2 immutable() {
 		return new IVec2(this);
 	}
 
