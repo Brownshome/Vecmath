@@ -67,6 +67,10 @@ public class MVec3 implements Vec3 {
 		set(x() * scale, y() * scale, z() * scale);
 	}
 
+	public void scale(Vec3 scale) {
+		set(scale.x() * x(), scale.y() * y(), scale.z() * z());
+	}
+
 	/**
 	 * Sets this vector to have a length of one. This will set the vector to NaN if
 	 * the length is zero.

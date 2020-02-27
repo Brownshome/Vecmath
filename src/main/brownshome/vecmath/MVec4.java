@@ -78,6 +78,10 @@ public class MVec4 implements Vec4 {
 		set(x() * scale, y() * scale, z() * scale, w() * scale);
 	}
 
+	public void scale(Vec4 scale) {
+		set(scale.x() * x(), scale.y() * y(), scale.z() * z(), scale.w() * w());
+	}
+
 	/**
 	 * Sets this vector to have a length of one. This will set the vector to NaN if
 	 * the length is zero.

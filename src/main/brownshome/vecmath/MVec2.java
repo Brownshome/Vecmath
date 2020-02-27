@@ -56,6 +56,10 @@ public class MVec2 implements Vec2 {
 		set(x() * scale, y() * scale);
 	}
 
+	public void scale(Vec2 scale) {
+		set(scale.x() * x(), scale.y() * y());
+	}
+
 	/**
 	 * Sets this vector to have a length of one. This will set the vector to NaN if
 	 * the length is zero.
