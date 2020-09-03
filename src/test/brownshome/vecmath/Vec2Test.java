@@ -7,12 +7,12 @@ import static brownshome.vecmath.CompareConstant.ACCURACY;
 import static org.junit.jupiter.api.Assertions.*;
 
 class Vec2Test {
-	private IRot2 A, B;
+	private IVec2 A, B;
 
 	@BeforeEach
 	void setUp() {
-		A = new IRot2(0.5, 0.5);
-		B = new IRot2(0.5, -0.5);
+		A = new IVec2(0.5, 0.5);
+		B = new IVec2(0.5, -0.5);
 	}
 
 	@Test

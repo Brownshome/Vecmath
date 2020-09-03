@@ -6,7 +6,7 @@ public class MRot2 extends MVec2 implements Rot2 {
 	}
 	
 	public MRot2(double angle) {
-		super(Math.cos(angle), -Math.sin(angle));
+		super(Math.cos(angle), Math.sin(angle));
 	}
 	
 	public MRot2(double x, double y) {

@@ -1,36 +1,80 @@
 package brownshome.vecmath;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static brownshome.vecmath.CompareConstant.ACCURACY;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MRot3Test {
+	private MRot3 A, B, C;
 
-	@Test
-	void fromAxisAngle() {
+	@BeforeEach
+	void setUp() {
+		A = MRot3.fromAxisAngle(IVec3.X_AXIS, Math.toRadians(90));
+		B = MRot3.fromAxisAngle(IVec3.Y_AXIS, Math.toRadians(90));
+		C = MRot3.fromAxisAngle(IVec3.X_AXIS, Math.toRadians(-90));
 	}
 
 	@Test
 	void multiplyLeft() {
+		Rot3 result = A;
+		A.multiplyLeft(B);
+		A.multiplyLeft(C);
+		Rot3 expected = new IRot3(0, 0, -Math.sqrt(0.5), Math.sqrt(0.5));
+
+		assertEquals(expected.x(), result.x(), ACCURACY);
+		assertEquals(expected.y(), result.y(), ACCURACY);
+		assertEquals(expected.z(), result.z(), ACCURACY);
+		assertEquals(expected.w(), result.w(), ACCURACY);
 	}
 
 	@Test
 	void multiplyRight() {
+		Rot3 result = C;
+		C.multiplyRight(B);
+		C.multiplyRight(A);
+		Rot3 expected = new IRot3(0, 0, -Math.sqrt(0.5), Math.sqrt(0.5));
+
+		assertEquals(expected.x(), result.x(), ACCURACY);
+		assertEquals(expected.y(), result.y(), ACCURACY);
+		assertEquals(expected.z(), result.z(), ACCURACY);
+		assertEquals(expected.w(), result.w(), ACCURACY);
 	}
 
 	@Test
 	void slerp() {
+		Rot3 result = A;
+		A.slerp(C, 0.25);
+		Rot3 expected = IRot3.fromAxisAngle(IVec3.X_AXIS, Math.toRadians(45));
+
+		assertEquals(expected.x(), result.x(), ACCURACY);
+		assertEquals(expected.y(), result.y(), ACCURACY);
+		assertEquals(expected.z(), result.z(), ACCURACY);
+		assertEquals(expected.w(), result.w(), ACCURACY);
 	}
 
 	@Test
 	void nLerp() {
-	}
+		Rot3 result = A;
+		A.slerp(C, 0.5);
+		Rot3 expected = IRot3.IDENTITY;
 
-	@Test
-	void conj() {
+		assertEquals(expected.x(), result.x(), ACCURACY);
+		assertEquals(expected.y(), result.y(), ACCURACY);
+		assertEquals(expected.z(), result.z(), ACCURACY);
+		assertEquals(expected.w(), result.w(), ACCURACY);
 	}
 
 	@Test
 	void invert() {
+		Rot3 result = A;
+		A.invert();
+		Rot3 expected = C;
+
+		assertEquals(expected.x(), result.x(), ACCURACY);
+		assertEquals(expected.y(), result.y(), ACCURACY);
+		assertEquals(expected.z(), result.z(), ACCURACY);
+		assertEquals(expected.w(), result.w(), ACCURACY);
 	}
 }

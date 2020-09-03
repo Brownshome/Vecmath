@@ -6,7 +6,7 @@ public class IRot2 extends IVec2 implements Rot2 {
 	}
 	
 	public IRot2(double angle) {
-		this(Math.cos(angle), -Math.sin(angle));
+		this(Math.cos(angle), Math.sin(angle));
 	}
 	
 	public IRot2() {

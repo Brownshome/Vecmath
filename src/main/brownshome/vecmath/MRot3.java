@@ -15,11 +15,7 @@ public class MRot3 extends MVec4 implements Rot3 {
 	 * @return A rotation representing the rotation by the axis-angle pair.
 	 */
 	public static MRot3 fromAxisAngle(Vec3 axis, double angle) {
-		angle = angle / 2;
-		double cos = Math.cos(angle);
-		double sin = Math.sin(angle);
-		
-		return new MRot3(axis.x() * sin, axis.y() * sin, axis.z() * sin, cos);
+		return IRot3.fromAxisAngle(axis, angle).mutable();
 	}
 	
 	/**
@@ -88,8 +84,6 @@ public class MRot3 extends MVec4 implements Rot3 {
 		scaleAdd(other, sOther);
 
 		// No normalisation required, except for numerical error
-
-		return;
 	}
 
 	/**

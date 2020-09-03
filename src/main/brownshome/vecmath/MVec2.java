@@ -79,11 +79,10 @@ public class MVec2 implements Vec2 {
 	}
 	
 	/**
-	 * Sets this vector to be the tangent of the given vector. This function rotates the vector counterclockwise in the topleft coordiante
-	 * system.
+	 * Sets this vector to be the tangent of the given vector. This function rotates the vector counterclockwise in the x-right, y-up coordinate system
 	 */
 	public void tangent(Vec2 v) {
-		set(v.y(), -v.x());
+		set(-v.y(), v.x());
 	}
 	
 	@Override
@@ -100,7 +99,9 @@ public class MVec2 implements Vec2 {
 		set(x() + vec.x() * scale, y() + vec.y() * scale);
 	}
 
-	/** Sets this vector to be the tangent of itself */
+	/**
+	 * Sets this vector to be the tangent of itself. This function rotates the vector counterclockwise in the x-right, y-up coordinate system
+	 */
 	public void tangent() {
 		tangent(this);
 	}
