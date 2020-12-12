@@ -11,14 +11,14 @@ class MVec4Test {
 
 	@BeforeEach
 	void setUp() {
-		A = new MVec4(1, 0, 0, 0);
+		A = Vec4.of(1, 0, 0, 0);
 	}
 
 	@Test
 	void addDoubles() {
 		Vec4 result = A;
 		A.add(1, -0.5, 0.5, 2);
-		Vec4 expected = new IVec4(2, -0.5, 0.5, 2);
+		Vec4 expected = Vec4.of(2, -0.5, 0.5, 2);
 
 		assertEquals(expected.x(), result.x(), ACCURACY);
 		assertEquals(expected.y(), result.y(), ACCURACY);
@@ -29,8 +29,8 @@ class MVec4Test {
 	@Test
 	void subtract() {
 		Vec4 result = A;
-		A.subtract(new IVec4(1, -0.5, 0.5, 0));
-		Vec4 expected = new IVec4(0, 0.5, -0.5, 0);
+		A.subtract(Vec4.of(1, -0.5, 0.5, 0));
+		Vec4 expected = Vec4.of(0, 0.5, -0.5, 0);
 
 		assertEquals(expected.x(), result.x(), ACCURACY);
 		assertEquals(expected.y(), result.y(), ACCURACY);
@@ -41,8 +41,8 @@ class MVec4Test {
 	@Test
 	void scaleVec() {
 		Vec4 result = A;
-		A.scale(new IVec4(0.5, -0.5, 0.5, 0));
-		Vec4 expected = new IVec4(0.5, 0, 0, 0);
+		A.scale(Vec4.of(0.5, -0.5, 0.5, 0));
+		Vec4 expected = Vec4.of(0.5, 0, 0, 0);
 
 		assertEquals(expected.x(), result.x(), ACCURACY);
 		assertEquals(expected.y(), result.y(), ACCURACY);
@@ -54,7 +54,7 @@ class MVec4Test {
 	void scaleDoubles() {
 		Vec4 result = A;
 		A.scale(0.5);
-		Vec4 expected = new IVec4(0.5, 0, 0, 0);
+		Vec4 expected = Vec4.of(0.5, 0, 0, 0);
 
 		assertEquals(expected.x(), result.x(), ACCURACY);
 		assertEquals(expected.y(), result.y(), ACCURACY);
@@ -64,9 +64,9 @@ class MVec4Test {
 
 	@Test
 	void normalize() {
-		MVec4 result = new MVec4(2, 0, 2, 0);
+		MVec4 result = Vec4.of(2, 0, 2, 0);
 		result.normalize();
-		Vec4 expected = new IVec4(Math.sqrt(0.5), 0, Math.sqrt(0.5), 0);
+		Vec4 expected = Vec4.of(Math.sqrt(0.5), 0, Math.sqrt(0.5), 0);
 
 		assertEquals(expected.x(), result.x(), ACCURACY);
 		assertEquals(expected.y(), result.y(), ACCURACY);
@@ -76,7 +76,7 @@ class MVec4Test {
 
 	@Test
 	void normalizeNan() {
-		MVec4 result = new MVec4(0, 0, 0, 0);
+		MVec4 result = Vec4.of(0, 0, 0, 0);
 		result.normalize();
 
 		assertTrue(Double.isNaN(result.x()));
@@ -88,8 +88,8 @@ class MVec4Test {
 	@Test
 	void addVec() {
 		Vec4 result = A;
-		A.add(new IVec4(2, -0.5, 0.5, 0));
-		Vec4 expected = new IVec4(3, -0.5, 0.5, 0);
+		A.add(Vec4.of(2, -0.5, 0.5, 0));
+		Vec4 expected = Vec4.of(3, -0.5, 0.5, 0);
 
 		assertEquals(expected.x(), result.x(), ACCURACY);
 		assertEquals(expected.y(), result.y(), ACCURACY);
@@ -100,8 +100,8 @@ class MVec4Test {
 	@Test
 	void scaleAdd() {
 		Vec4 result = A;
-		A.scaleAdd(new IVec4(1, -0.5, 0.1, 1), 0.5);
-		Vec4 expected = new IVec4(1.5, -0.25, 0.05, 0.5);
+		A.scaleAdd(Vec4.of(1, -0.5, 0.1, 1), 0.5);
+		Vec4 expected = Vec4.of(1.5, -0.25, 0.05, 0.5);
 
 		assertEquals(expected.x(), result.x(), ACCURACY);
 		assertEquals(expected.y(), result.y(), ACCURACY);
@@ -113,7 +113,7 @@ class MVec4Test {
 	void negate() {
 		Vec4 result = A;
 		A.negate();
-		Vec4 expected = new IVec4(-1, 0, 0, 0);
+		Vec4 expected = Vec4.of(-1, 0, 0, 0);
 
 		assertEquals(expected.x(), result.x(), ACCURACY);
 		assertEquals(expected.y(), result.y(), ACCURACY);
@@ -124,8 +124,8 @@ class MVec4Test {
 	@Test
 	void lerp() {
 		Vec4 result = A;
-		A.lerp(new IVec4(1, -0.5, 0.1, 0), 0.25);
-		Vec4 expected = new IVec4(1, -0.125, 0.025, 0);
+		A.lerp(Vec4.of(1, -0.5, 0.1, 0), 0.25);
+		Vec4 expected = Vec4.of(1, -0.125, 0.025, 0);
 
 		assertEquals(expected.x(), result.x(), ACCURACY);
 		assertEquals(expected.y(), result.y(), ACCURACY);

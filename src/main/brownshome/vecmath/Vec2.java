@@ -2,6 +2,14 @@ package brownshome.vecmath;
 
 /** An interface representing a 2D vector. This can be used as a type representing a Vec2 that may be edited by the creator by by no-one else. */
 public interface Vec2 {
+	Vec2 ZERO = new BasicVec2(0, 0);
+	Vec2 X_AXIS = new BasicVec2(1, 0);
+	Vec2 Y_AXIS = new BasicVec2(0, 1);
+
+	static MVec2 of(double x, double y) {
+		return new BasicVec2(x, y);
+	}
+
 	double x();
 	double y();
 	
@@ -49,13 +57,6 @@ public interface Vec2 {
 	}
 
 	/**
-	 * Returns an immutable version of this object.
-	 **/
-	default Vec2 immutable() {
-		return new IVec2(this);
-	}
-
-	/**
 	 * Gets an angle between this vector and the given vector in radians. This angle will be positive, and always in the
 	 * range [0, pi]
 	 **/
@@ -68,7 +69,7 @@ public interface Vec2 {
 	/**
 	 * Returns an mutable copy of this object.
 	 **/
-	default MVec2 mutable() {
-		return new MVec2(this);
+	default MVec2 copy() {
+		return new BasicVec2(this);
 	}
 }

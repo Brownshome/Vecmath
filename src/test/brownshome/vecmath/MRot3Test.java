@@ -11,9 +11,9 @@ class MRot3Test {
 
 	@BeforeEach
 	void setUp() {
-		A = MRot3.fromAxisAngle(IVec3.X_AXIS, Math.toRadians(90));
-		B = MRot3.fromAxisAngle(IVec3.Y_AXIS, Math.toRadians(90));
-		C = MRot3.fromAxisAngle(IVec3.X_AXIS, Math.toRadians(-90));
+		A = Rot3.fromAxisAngle(Vec3.X_AXIS, Math.toRadians(90));
+		B = Rot3.fromAxisAngle(Vec3.Y_AXIS, Math.toRadians(90));
+		C = Rot3.fromAxisAngle(Vec3.X_AXIS, Math.toRadians(-90));
 	}
 
 	@Test
@@ -21,7 +21,7 @@ class MRot3Test {
 		Rot3 result = A;
 		A.multiplyLeft(B);
 		A.multiplyLeft(C);
-		Rot3 expected = new IRot3(0, 0, -Math.sqrt(0.5), Math.sqrt(0.5));
+		Rot3 expected = Rot3.of(0, 0, -Math.sqrt(0.5), Math.sqrt(0.5));
 
 		assertEquals(expected.x(), result.x(), ACCURACY);
 		assertEquals(expected.y(), result.y(), ACCURACY);
@@ -34,7 +34,7 @@ class MRot3Test {
 		Rot3 result = C;
 		C.multiplyRight(B);
 		C.multiplyRight(A);
-		Rot3 expected = new IRot3(0, 0, -Math.sqrt(0.5), Math.sqrt(0.5));
+		Rot3 expected = Rot3.of(0, 0, -Math.sqrt(0.5), Math.sqrt(0.5));
 
 		assertEquals(expected.x(), result.x(), ACCURACY);
 		assertEquals(expected.y(), result.y(), ACCURACY);
@@ -46,7 +46,7 @@ class MRot3Test {
 	void slerp() {
 		Rot3 result = A;
 		A.slerp(C, 0.25);
-		Rot3 expected = IRot3.fromAxisAngle(IVec3.X_AXIS, Math.toRadians(45));
+		Rot3 expected = Rot3.fromAxisAngle(Vec3.X_AXIS, Math.toRadians(45));
 
 		assertEquals(expected.x(), result.x(), ACCURACY);
 		assertEquals(expected.y(), result.y(), ACCURACY);
@@ -58,7 +58,7 @@ class MRot3Test {
 	void nLerp() {
 		Rot3 result = A;
 		A.slerp(C, 0.5);
-		Rot3 expected = IRot3.IDENTITY;
+		Rot3 expected = Rot3.IDENTITY;
 
 		assertEquals(expected.x(), result.x(), ACCURACY);
 		assertEquals(expected.y(), result.y(), ACCURACY);

@@ -7,12 +7,12 @@ import static brownshome.vecmath.CompareConstant.ACCURACY;
 import static org.junit.jupiter.api.Assertions.*;
 
 class Vec3Test {
-	private IVec3 A, B;
+	private Vec3 A, B;
 
 	@BeforeEach
 	void setUp() {
-		A = new IVec3(0.5, 0.5, 0.5);
-		B = new IVec3(0.5, -0.5, -0.5);
+		A = Vec3.of(0.5, 0.5, 0.5);
+		B = Vec3.of(0.5, -0.5, -0.5);
 	}
 
 	@Test

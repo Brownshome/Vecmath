@@ -2,6 +2,12 @@ package brownshome.vecmath;
 
 /** An interface representing a 4D vector. This can be used as a type representing a Vec4 that may be edited by the creator by by no-one else. */
 public interface Vec4 {
+	Vec4 ZERO = new BasicVec4(0, 0, 0, 0);
+
+	static MVec4 of(double x, double y, double z, double w) {
+		return new BasicVec4(x, y, z, w);
+	}
+
 	double x();
 	double y();
 	double z();
@@ -52,13 +58,6 @@ public interface Vec4 {
 		return x() == other.x() && y() == other.y() && z() == other.z() && w() == other.w();
 	}
 
-	/**
-	 * Returns an immutable version of this object.
-	 **/
-	default Vec4 immutable() {
-		return new IVec4(this);
-	}
-
 	/** Gets an angle between this vector and the given vector in radians*/
 	default double angle(Vec4 vec) {
 		double angle = this.dot(vec) / (this.length() * vec.length());
@@ -69,7 +68,7 @@ public interface Vec4 {
 	/**
 	 * Returns an mutable copy of this object.
 	 **/
-	default MVec4 mutable() {
-		return new MVec4(this);
+	default MVec4 copy() {
+		return new BasicVec4(this);
 	}
 }

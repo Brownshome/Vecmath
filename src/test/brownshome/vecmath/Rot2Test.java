@@ -6,18 +6,18 @@ import static brownshome.vecmath.CompareConstant.ACCURACY;
 import static org.junit.jupiter.api.Assertions.*;
 
 class Rot2Test {
-	private IRot2 A, B;
+	private Rot2 A, B;
 
 	@BeforeEach
 	void setUp() {
-		A = new IRot2(Math.toRadians(90));
-		B = new IRot2(Math.toRadians(45));
+		A = Rot2.fromAngle(Math.toRadians(90));
+		B = Rot2.fromAngle(Math.toRadians(45));
 	}
 
 	@Test
 	void rotate() {
-		IVec2 expected = new IVec2(0, 1);
-		MVec2 toBeRotated = new MVec2(1, 0);
+		Vec2 expected = Vec2.of(0, 1);
+		MVec2 toBeRotated = Vec2.of(1, 0);
 		A.rotate(toBeRotated);
 
 		assertEquals(expected.x(), toBeRotated.x(), ACCURACY);

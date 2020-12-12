@@ -11,14 +11,14 @@ class MRot2Test {
 
 	@BeforeEach
 	void setUp() {
-		A = new MRot2(Math.toRadians(20));
+		A = Rot2.fromAngle(Math.toRadians(20));
 	}
 
 	@Test
 	void invert() {
 		A.invert();
 		Rot2 result = A;
-		Rot2 expected = new IRot2(Math.toRadians(-20));
+		Rot2 expected = Rot2.fromAngle(Math.toRadians(-20));
 
 		assertEquals(expected.sin(), result.sin(), ACCURACY);
 		assertEquals(expected.cos(), result.cos(), ACCURACY);

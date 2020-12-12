@@ -11,14 +11,14 @@ class MVec2Test {
 
 	@BeforeEach
 	void setUp() {
-		A = IVec2.X_AXIS.mutable();
+		A = Vec2.X_AXIS.copy();
 	}
 
 	@Test
 	void addDoubles() {
 		Vec2 result = A;
 		A.add(1, -0.5);
-		Vec2 expected = new IVec2(2, -0.5);
+		Vec2 expected = Vec2.of(2, -0.5);
 
 		assertEquals(expected.x(), result.x(), ACCURACY);
 		assertEquals(expected.y(), result.y(), ACCURACY);
@@ -27,8 +27,8 @@ class MVec2Test {
 	@Test
 	void subtract() {
 		Vec2 result = A;
-		A.subtract(new IVec2(1, -0.5));
-		Vec2 expected = new IVec2(0, 0.5);
+		A.subtract(Vec2.of(1, -0.5));
+		Vec2 expected = Vec2.of(0, 0.5);
 
 		assertEquals(expected.x(), result.x(), ACCURACY);
 		assertEquals(expected.y(), result.y(), ACCURACY);
@@ -37,8 +37,8 @@ class MVec2Test {
 	@Test
 	void scaleVec() {
 		Vec2 result = A;
-		A.scale(new IVec2(0.5, -0.5));
-		Vec2 expected = new IVec2(0.5, 0);
+		A.scale(Vec2.of(0.5, -0.5));
+		Vec2 expected = Vec2.of(0.5, 0);
 
 		assertEquals(expected.x(), result.x(), ACCURACY);
 		assertEquals(expected.y(), result.y(), ACCURACY);
@@ -48,7 +48,7 @@ class MVec2Test {
 	void scaleDoubles() {
 		Vec2 result = A;
 		A.scale(0.5);
-		Vec2 expected = new IVec2(0.5, 0);
+		Vec2 expected = Vec2.of(0.5, 0);
 
 		assertEquals(expected.x(), result.x(), ACCURACY);
 		assertEquals(expected.y(), result.y(), ACCURACY);
@@ -56,9 +56,9 @@ class MVec2Test {
 
 	@Test
 	void normalize() {
-		MVec2 result = new MVec2(2, 0);
+		MVec2 result = Vec2.of(2, 0);
 		result.normalize();
-		Vec2 expected = new IVec2(1, 0);
+		Vec2 expected = Vec2.of(1, 0);
 
 		assertEquals(expected.x(), result.x(), ACCURACY);
 		assertEquals(expected.y(), result.y(), ACCURACY);
@@ -66,7 +66,7 @@ class MVec2Test {
 
 	@Test
 	void normalizeNan() {
-		MVec2 result = new MVec2(0, 0);
+		MVec2 result = Vec2.of(0, 0);
 		result.normalize();
 
 		assertTrue(Double.isNaN(result.x()));
@@ -76,8 +76,8 @@ class MVec2Test {
 	@Test
 	void addVec() {
 		Vec2 result = A;
-		A.add(new IVec2(2, -0.5));
-		Vec2 expected = new IVec2(3, -0.5);
+		A.add(Vec2.of(2, -0.5));
+		Vec2 expected = Vec2.of(3, -0.5);
 
 		assertEquals(expected.x(), result.x(), ACCURACY);
 		assertEquals(expected.y(), result.y(), ACCURACY);
@@ -87,7 +87,7 @@ class MVec2Test {
 	void tangentSelf() {
 		Vec2 result = A;
 		A.tangent();
-		Vec2 expected = new IVec2(0, 1);
+		Vec2 expected = Vec2.of(0, 1);
 
 		assertEquals(expected.x(), result.x(), ACCURACY);
 		assertEquals(expected.y(), result.y(), ACCURACY);
@@ -96,8 +96,8 @@ class MVec2Test {
 	@Test
 	void scaleAdd() {
 		Vec2 result = A;
-		A.scaleAdd(new IVec2(1, -0.5), 0.5);
-		Vec2 expected = new IVec2(1.5, -0.25);
+		A.scaleAdd(Vec2.of(1, -0.5), 0.5);
+		Vec2 expected = Vec2.of(1.5, -0.25);
 
 		assertEquals(expected.x(), result.x(), ACCURACY);
 		assertEquals(expected.y(), result.y(), ACCURACY);
@@ -107,7 +107,7 @@ class MVec2Test {
 	void tangent() {
 		Vec2 result = A;
 		A.tangent(A);
-		Vec2 expected = new IVec2(0, 1);
+		Vec2 expected = Vec2.of(0, 1);
 
 		assertEquals(expected.x(), result.x(), ACCURACY);
 		assertEquals(expected.y(), result.y(), ACCURACY);
@@ -117,7 +117,7 @@ class MVec2Test {
 	void negate() {
 		Vec2 result = A;
 		A.negate();
-		Vec2 expected = new IVec2(-1, 0);
+		Vec2 expected = Vec2.of(-1, 0);
 
 		assertEquals(expected.x(), result.x(), ACCURACY);
 		assertEquals(expected.y(), result.y(), ACCURACY);

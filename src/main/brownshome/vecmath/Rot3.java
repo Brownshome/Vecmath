@@ -2,6 +2,39 @@ package brownshome.vecmath;
 
 /** Represents a 3 dimensional rotation. Use this interface to represent a rotation that may be edited by the creator and no-one else. */
 public interface Rot3 extends Vec4 {
+	Rot3 IDENTITY = new BasicVec4(0, 0, 0, 1);
+
+	/**
+	 * Produces a quaternion that represents a rotation by the supplied axis angle combination.
+	 * @param axis The axis to rotate by
+	 * @param angle The angle to rotate by. Looking along the axis, this is clockwise in a right-handed coordinate system
+	 *              and counter-clockwise in a left-handed system.
+	 * @return A rotation representing the rotation by the axis-angle pair.
+	 */
+	static MRot3 fromAxisAngle(Vec3 axis, double angle) {
+		angle = angle / 2;
+		double cos = Math.cos(angle);
+		double sin = Math.sin(angle);
+
+		return new BasicVec4(axis.x() * sin, axis.y() * sin, axis.z() * sin, cos);
+	}
+
+	static MRot3 of(double x, double y, double z, double w) {
+		return new BasicVec4(x, y, z, w);
+	}
+
+	static MRot3 of(Vec4 v) {
+		return new BasicVec4(v);
+	}
+
+	/**
+	 * Converts a vec3 into a quaternion. This quaternion is a 'pure' quaternion, and not normalised unless v is normalised
+	 * @param v The input vector
+	 */
+	static MRot3 fromVector(Vec3 v) {
+		return new BasicVec4(v.x(), v.y(), v.z(), 0);
+	}
+
 	/**
 	 * Rotates a given vector by this rotation.
 	 * @param v The vector to rotate
@@ -10,10 +43,10 @@ public interface Rot3 extends Vec4 {
 		// This might be slower than expanding the expression manually. Benchmark if needed.
 		// Evaluate p` = qpq*
 
-		MRot3 conj = new MRot3(this);
+		MRot3 conj = copy();
 		conj.invert();
 
-		Rot3 point = new IRot3(v);
+		Rot3 point = Rot3.fromVector(v);
 
 		conj.multiplyLeft(point);
 		conj.multiplyLeft(this);
@@ -26,7 +59,7 @@ public interface Rot3 extends Vec4 {
 	 * is needed to move from one orientation to the other.
 	 **/
 	default double angleTo(Rot3 o) {
-		MRot3 difference = mutable();
+		MRot3 difference = copy();
 		difference.invert();
 		difference.multiplyLeft(o);
 
@@ -47,18 +80,10 @@ public interface Rot3 extends Vec4 {
 	}
 
 	/**
-	 * Returns an immutable version of this object.
-	 **/
-	@Override
-	default Rot3 immutable() {
-		return new IRot3(this);
-	}
-
-	/**
 	 * Returns an mutable copy of this object.
 	 **/
 	@Override
-	default MRot3 mutable() {
-		return new MRot3(this);
+	default MRot3 copy() {
+		return new BasicVec4(this);
 	}
 }

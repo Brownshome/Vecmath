@@ -7,19 +7,19 @@ import static brownshome.vecmath.CompareConstant.ACCURACY;
 import static org.junit.jupiter.api.Assertions.*;
 
 class Rot3Test {
-	private IRot3 A, B;
+	private Rot3 A, B;
 
 	@BeforeEach
 	void setUp() {
-		A = IRot3.fromAxisAngle(IVec3.X_AXIS, Math.toRadians(90));
-		B = IRot3.fromAxisAngle(IVec3.Y_AXIS, Math.toRadians(90));
+		A = Rot3.fromAxisAngle(Vec3.X_AXIS, Math.toRadians(90));
+		B = Rot3.fromAxisAngle(Vec3.Y_AXIS, Math.toRadians(90));
 	}
 
 	@Test
 	void rotate() {
-		MVec3 result = IVec3.Y_AXIS.mutable();
+		MVec3 result = Vec3.Y_AXIS.copy();
 		A.rotate(result);
-		IVec3 expected = IVec3.Z_AXIS;
+		Vec3 expected = Vec3.Z_AXIS;
 
 		assertEquals(expected.x(), result.x(), ACCURACY);
 		assertEquals(expected.y(), result.y(), ACCURACY);
@@ -49,7 +49,7 @@ class Rot3Test {
 	@Test
 	void fromAxisAngle() {
 		Rot3 result = A;
-		Rot3 expected = new IRot3(Math.sqrt(0.5), 0, 0, Math.sqrt(0.5));
+		Rot3 expected = Rot3.of(Math.sqrt(0.5), 0, 0, Math.sqrt(0.5));
 
 		assertEquals(expected.x(), result.x(), ACCURACY);
 		assertEquals(expected.y(), result.y(), ACCURACY);

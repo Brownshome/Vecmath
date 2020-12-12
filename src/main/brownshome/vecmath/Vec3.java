@@ -2,6 +2,15 @@ package brownshome.vecmath;
 
 /** An interface representing a 3D vector. This can be used as a type representing a Vec3 that may be edited by the creator by by no-one else. */
 public interface Vec3 {
+	Vec3 ZERO = new BasicVec3(0, 0, 0);
+	Vec3 X_AXIS = new BasicVec3(1, 0, 0);
+	Vec3 Y_AXIS = new BasicVec3(0, 1, 0);
+	Vec3 Z_AXIS = new BasicVec3(0, 0, 1);
+
+	static MVec3 of(double x, double y, double z) {
+		return new BasicVec3(x, y, z);
+	}
+
 	double x();
 	double y();
 	double z();
@@ -50,13 +59,6 @@ public interface Vec3 {
 		return x() == other.x() && y() == other.y() && z() == other.z();
 	}
 
-	/**
-	 * Returns an immutable version of this object.
-	 **/
-	default Vec3 immutable() {
-		return new IVec3(this);
-	}
-
 	/** Gets an angle between this vector and the given vector in radians*/
 	default double angle(Vec3 vec) {
 		double angle = this.dot(vec) / (this.length() * vec.length());
@@ -67,7 +69,7 @@ public interface Vec3 {
 	/**
 	 * Returns an mutable copy of this object.
 	 **/
-	default MVec3 mutable() {
-		return new MVec3(this);
+	default MVec3 copy() {
+		return new BasicVec3(this);
 	}
 }
