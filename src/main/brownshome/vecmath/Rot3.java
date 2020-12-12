@@ -1,5 +1,7 @@
 package brownshome.vecmath;
 
+import brownshome.vecmath.array.ArrayVec4;
+
 /** Represents a 3 dimensional rotation. Use this interface to represent a rotation that may be edited by the creator and no-one else. */
 public interface Rot3 extends Vec4 {
 	Rot3 IDENTITY = new BasicVec4(0, 0, 0, 1);
@@ -33,6 +35,36 @@ public interface Rot3 extends Vec4 {
 	 */
 	static MRot3 fromVector(Vec3 v) {
 		return new BasicVec4(v.x(), v.y(), v.z(), 0);
+	}
+
+	/**
+	 * Creates a rotation from the components in this array. Edits to the array will change the rotation and vice-versa
+	 * @param array the array
+	 * @return a rotation
+	 */
+	static MRot3 of(double[] array) {
+		return of(array, 0);
+	}
+
+	/**
+	 * Creates a rotation from the components in this array. Edits to the array will change the rotation and vice-versa
+	 * @param array the array
+	 * @param offset the index of the first component in the array
+	 * @return a rotation
+	 */
+	static MRot3 of(double[] array, int offset) {
+		return of(array, offset, 1);
+	}
+
+	/**
+	 * Creates a rotation from the components in this array. Edits to the array will change the rotation and vice-versa
+	 * @param array the array
+	 * @param offset the index of the first component in the array
+	 * @param stride the stride of the components in the array
+	 * @return a rotation
+	 */
+	static MRot3 of(double[] array, int offset, int stride) {
+		return new ArrayVec4(array, offset, stride);
 	}
 
 	/**

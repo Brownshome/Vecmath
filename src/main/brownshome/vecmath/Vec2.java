@@ -1,5 +1,7 @@
 package brownshome.vecmath;
 
+import brownshome.vecmath.array.ArrayVec2;
+
 /** An interface representing a 2D vector. This can be used as a type representing a Vec2 that may be edited by the creator by by no-one else. */
 public interface Vec2 {
 	Vec2 ZERO = new BasicVec2(0, 0);
@@ -8,6 +10,36 @@ public interface Vec2 {
 
 	static MVec2 of(double x, double y) {
 		return new BasicVec2(x, y);
+	}
+
+	/**
+	 * Creates a vector from the components in this array. Edits to the array will change the rotation and vice-versa
+	 * @param array the array
+	 * @return a vector
+	 */
+	static MVec2 of(double[] array) {
+		return of(array, 0);
+	}
+
+	/**
+	 * Creates a vector from the components in this array. Edits to the array will change the rotation and vice-versa
+	 * @param array the array
+	 * @param offset the index of the first component in the array
+	 * @return a vector
+	 */
+	static MVec2 of(double[] array, int offset) {
+		return of(array, offset, 1);
+	}
+
+	/**
+	 * Creates a vector from the components in this array. Edits to the array will change the rotation and vice-versa
+	 * @param array the array
+	 * @param offset the index of the first component in the array
+	 * @param stride the stride of the components in the array
+	 * @return a vector
+	 */
+	static MVec2 of(double[] array, int offset, int stride) {
+		return new ArrayVec2(array, offset, stride);
 	}
 
 	double x();

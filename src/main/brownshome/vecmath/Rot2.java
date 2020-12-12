@@ -1,5 +1,7 @@
 package brownshome.vecmath;
 
+import brownshome.vecmath.array.ArrayVec2;
+
 /** Represents a 2 dimensional rotation. Use this interface to represent a rotation that may be edited by the creator and no-one else. */
 public interface Rot2 extends Vec2 {
 	Rot2 IDENTITY = new BasicVec2(1, 0);
@@ -12,8 +14,43 @@ public interface Rot2 extends Vec2 {
 		return new BasicVec2(x, y);
 	}
 
+	/**
+	 * Copies the components of a Vec2 into a rotation that rotates (1, 0) to this vector
+	 * @param copy the vector to copy the components from
+	 * @return a rotation
+	 */
 	static MRot2 of(Vec2 copy) {
 		return new BasicVec2(copy);
+	}
+
+	/**
+	 * Creates a rotation from the components in this array. Edits to the array will change the rotation and vice-versa
+	 * @param array the array
+	 * @return a rotation
+	 */
+	static MRot2 of(double[] array) {
+		return of(array, 0);
+	}
+
+	/**
+	 * Creates a rotation from the components in this array. Edits to the array will change the rotation and vice-versa
+	 * @param array the array
+	 * @param offset the index of the first component in the array
+	 * @return a rotation
+	 */
+	static MRot2 of(double[] array, int offset) {
+		return of(array, offset, 1);
+	}
+
+	/**
+	 * Creates a rotation from the components in this array. Edits to the array will change the rotation and vice-versa
+	 * @param array the array
+	 * @param offset the index of the first component in the array
+	 * @param stride the stride of the components in the array
+	 * @return a rotation
+	 */
+	static MRot2 of(double[] array, int offset, int stride) {
+		return new ArrayVec2(array, offset, stride);
 	}
 
 	default void rotate(MVec2 v) {
