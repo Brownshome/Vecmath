@@ -1,5 +1,6 @@
 package brownshome.vecmath;
 
+import brownshome.vecmath.matrix.Matrix;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -37,7 +38,7 @@ class Rot3Test {
 	@Test
 	void createMatrix() {
 		Matrix matrix = A.createMatrix();
-		Matrix expected = new Matrix(new double[] {
+		Matrix expected = Matrix.of(new double[] {
 				1, 0, 0,
 				0, 0, -1,
 				0, 1, 0

@@ -7,4 +7,5 @@
  */
 module brownshome.vecmath {
 	exports brownshome.vecmath;
+	exports brownshome.vecmath.matrix;
 }
