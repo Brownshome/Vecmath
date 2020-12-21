@@ -134,6 +134,16 @@ class MatrixViewTest {
 	}
 
 	@Test
+	void multiplyWideByTall() {
+		Matrix result = Matrix.of(new double[] { 1, 0 }, 1, 2).multiply(Matrix.of(new double[] { 1, 0 }, 2, 1));
+		Matrix expected = Matrix.of(new double[] { 1 }, 1, 1);
+
+		assertEquals(expected.rows(), result.rows());
+		assertEquals(expected.columns(), result.columns());
+		assertArrayEquals(expected.backingArray(), result.backingArray(), ACCURACY);
+	}
+
+	@Test
 	void fastMultiply() {
 		var fastChecker = new MatrixViewWithFastMultiply() {
 			boolean wasLeftCalled = false;

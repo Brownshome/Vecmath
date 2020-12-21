@@ -458,7 +458,7 @@ public interface MatrixView {
 		for (int r = 0; r < rows(); r++) {
 			for (int k = 0; k < columns(); k++) {
 				for (int c = 0; c < other.columns(); c++) {
-					n[r * columns() + c] += get(r, k) * other.get(k, c);
+					n[r * other.columns() + c] += get(r, k) * other.get(k, c);
 				}
 			}
 		}
