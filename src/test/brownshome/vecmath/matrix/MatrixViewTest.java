@@ -212,4 +212,14 @@ class MatrixViewTest {
 		assertEquals(expected.columns(), result.columns());
 		assertArrayEquals(expected.backingArray(), result.copy().backingArray());
 	}
+
+	@Test
+	void cross() {
+		var result = MatrixView.cross(Vec3.of(2, -1, 5));
+		var expected = Matrix.of(new double[] { 0, -5, -1, 5, 0, -2, 1, 2, 0 }, 3, 3);
+
+		assertEquals(expected.rows(), result.rows());
+		assertEquals(expected.columns(), result.columns());
+		assertArrayEquals(expected.backingArray(), result.copy().backingArray());
+	}
 }

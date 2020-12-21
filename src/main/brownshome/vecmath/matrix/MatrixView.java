@@ -381,6 +381,44 @@ public interface MatrixView {
 	}
 
 	/**
+	 * Creates a matrix that represents the cross product of vec.
+	 *
+	 * cross(vec) * a = vec x a
+	 *
+	 * @param vec the vector to cross using
+	 * @return a matrix such that Va = v x a
+	 */
+	static MatrixView cross(Vec3 vec) {
+		return new MatrixView() {
+			@Override
+			public int rows() {
+				return 3;
+			}
+
+			@Override
+			public int columns() {
+				return 3;
+			}
+
+			@Override
+			public double get(int row, int column) {
+				if (row == column) {
+					return 0.0;
+				}
+
+				double result = switch (row + column) {
+					case 1 -> -vec.z();
+					case 2 -> vec.y();
+					case 3 -> -vec.x();
+					default -> 0.0;
+				};
+
+				return column > row ? result : -result;
+			}
+		};
+	}
+
+	/**
 	 * The number of rows in this matrix
 	 *
 	 * @return the number of rows
