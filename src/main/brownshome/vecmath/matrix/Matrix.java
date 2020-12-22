@@ -167,9 +167,9 @@ public final class Matrix implements MatrixView {
 
 		if (other instanceof Matrix) {
 			add((Matrix) other);
+		} else {
+			slowAddPath(other);
 		}
-
-		slowAddPath(other);
 	}
 
 	/**
@@ -202,9 +202,9 @@ public final class Matrix implements MatrixView {
 
 		if (other instanceof Matrix) {
 			scaleAdd(scale, (Matrix) other);
+		} else {
+			slowScaleAddPath(scale, other);
 		}
-
-		slowScaleAddPath(scale, other);
 	}
 
 	/**
@@ -241,9 +241,9 @@ public final class Matrix implements MatrixView {
 
 		if (other instanceof Matrix) {
 			set((Matrix) other);
+		} else {
+			slowPathSet(other);
 		}
-
-		slowPathSet(other);
 	}
 
 	/**

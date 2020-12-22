@@ -55,6 +55,36 @@ class MatrixTest {
 	}
 
 	@Test
+	void addMatrixAsView() {
+		A.add((MatrixView) Matrix.of(new double[] { 1, 0, 0, 1 }, 2, 2));
+		Matrix expected = Matrix.of(new double[] { 2, 0, 0.5, 1.5 }, 2, 2);
+
+		assertEquals(expected.rows(), A.rows());
+		assertEquals(expected.columns(), A.columns());
+		assertArrayEquals(expected.backingArray(), A.backingArray(), ACCURACY);
+	}
+
+	@Test
+	void scaleAddMatrixAsView() {
+		A.scaleAdd(2, (MatrixView) Matrix.of(new double[] { 1, 0, 0, 1 }, 2, 2));
+		Matrix expected = Matrix.of(new double[] { 3, 0, 0.5, 2.5 }, 2, 2);
+
+		assertEquals(expected.rows(), A.rows());
+		assertEquals(expected.columns(), A.columns());
+		assertArrayEquals(expected.backingArray(), A.backingArray(), ACCURACY);
+	}
+
+	@Test
+	void setMatrixAsView() {
+		A.set((MatrixView) Matrix.of(new double[] { 1, 0, 0, 1 }, 2, 2));
+		Matrix expected = Matrix.of(new double[] { 1, 0, 0, 1 }, 2, 2);
+
+		assertEquals(expected.rows(), A.rows());
+		assertEquals(expected.columns(), A.columns());
+		assertArrayEquals(expected.backingArray(), A.backingArray());
+	}
+
+	@Test
 	void addView() {
 		A.add(MatrixView.of(new double[] { 1, 0 }, new double[] { 0, 1 }));
 		Matrix expected = Matrix.of(new double[] { 2, 0, 0.5, 1.5 }, 2, 2);
