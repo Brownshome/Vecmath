@@ -232,4 +232,12 @@ class MatrixViewTest {
 		assertEquals(expected.columns(), result.columns());
 		assertArrayEquals(expected.backingArray(), result.copy().backingArray());
 	}
+
+	@Test
+	void asScalar() {
+		var result = MatrixView.constant(5.0, 1, 1).asScalar();
+		var expected = 5.0;
+
+		assertEquals(expected, result);
+	}
 }

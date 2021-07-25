@@ -475,6 +475,18 @@ public interface MatrixView {
 	}
 
 	/**
+	 * Returns this matrix as a scalar. If this matrix is not a single value and assertions are
+	 * turned on an assertion error will be thrown. This method should only be used on matrix that
+	 * have one row and one column
+	 * @return This matrix as a scalar
+	 */
+	default double asScalar() {
+		assert rows() == 1 && columns() == 1;
+
+		return get(0, 0);
+	}
+
+	/**
 	 * Copies this matrix, the new copy will be completely disjoint from this matrix, and is guaranteed to be in row-major
 	 * format with no offset.
 	 * @return A copy of this matrix
