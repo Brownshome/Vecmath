@@ -30,7 +30,18 @@ class Rot3Test {
 	@Test
 	void angleTo() {
 		double result = A.angleTo(B);
-		double expected = Math.toRadians(90);
+		double expected = Math.toRadians(120);
+
+		assertEquals(expected, result, ACCURACY);
+	}
+
+	@Test
+	void angleToSameAxis() {
+		var axis = Vec3.of(1, 2, 3);
+		axis.normalize();
+
+		double result = Rot3.fromAxisAngle(axis, 1).angleTo(Rot3.fromAxisAngle(axis, 2));
+		double expected = 1.0;
 
 		assertEquals(expected, result, ACCURACY);
 	}

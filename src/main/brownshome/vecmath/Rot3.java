@@ -96,8 +96,13 @@ public interface Rot3 extends Vec4 {
 		difference.invert();
 		difference.multiplyLeft(o);
 
+		// Guard against normalisation errors
+		if (Math.abs(difference.w()) >= 1.0) {
+			return 0.0;
+		}
+
 		// ABS to clamp the result to pi
-		return 2.0 * Math.acos(Math.abs(o.w()));
+		return 2.0 * Math.acos(Math.abs(difference.w()));
 	}
 
 	/** Returns a matrix R such as R * p = p' */
