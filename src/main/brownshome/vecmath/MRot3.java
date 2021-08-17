@@ -70,11 +70,9 @@ public interface MRot3 extends MVec4, Rot3 {
 	 * @param t The amount to interpolate by. This must be in the range [0,1]
 	 */
 	default void nLerp(Rot3 other, double t) {
-		double dot = dot(other);
-
-		// This is to avoid rotating in the wrong direction, and to avoid issues with lerping through 0
-		if(dot < 0.0) {
-			dot = -dot;
+		// Always rotate towards the closest representation, this will avoid interpolating through [0, 0, 0, 0]
+		// and take the shortest path on the 4-sphere
+		if(dot(other) < 0.0) {
 			scale(-1.0);
 		}
 

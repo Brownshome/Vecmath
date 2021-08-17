@@ -10,6 +10,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class Rot3Test {
 	private Rot3 A, B;
 
+	private static void assertRotEquals(Rot3 expected, Rot3 result) {
+		assertEquals(1.0, Math.abs(expected.dot(result)), ACCURACY, "expected: %s but was: %s".formatted(expected, result));
+	}
+
 	@BeforeEach
 	void setUp() {
 		A = Rot3.fromAxisAngle(Vec3.X_AXIS, Math.toRadians(90));
@@ -63,9 +67,6 @@ class Rot3Test {
 		Rot3 result = A;
 		Rot3 expected = Rot3.of(Math.sqrt(0.5), 0, 0, Math.sqrt(0.5));
 
-		assertEquals(expected.x(), result.x(), ACCURACY);
-		assertEquals(expected.y(), result.y(), ACCURACY);
-		assertEquals(expected.z(), result.z(), ACCURACY);
-		assertEquals(expected.w(), result.w(), ACCURACY);
+		assertRotEquals(expected, result);
 	}
 }

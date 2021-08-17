@@ -16,6 +16,10 @@ class MRot3Test {
 		C = Rot3.fromAxisAngle(Vec3.X_AXIS, Math.toRadians(-90));
 	}
 
+	private static void assertRotEquals(Rot3 expected, Rot3 result) {
+		assertEquals(1.0, Math.abs(expected.dot(result)), ACCURACY, "expected: %s but was: %s".formatted(expected, result));
+	}
+
 	@Test
 	void multiplyLeft() {
 		Rot3 result = A;
@@ -23,10 +27,7 @@ class MRot3Test {
 		A.multiplyLeft(C);
 		Rot3 expected = Rot3.of(0, 0, -Math.sqrt(0.5), Math.sqrt(0.5));
 
-		assertEquals(expected.x(), result.x(), ACCURACY);
-		assertEquals(expected.y(), result.y(), ACCURACY);
-		assertEquals(expected.z(), result.z(), ACCURACY);
-		assertEquals(expected.w(), result.w(), ACCURACY);
+		assertRotEquals(expected, result);
 	}
 
 	@Test
@@ -36,10 +37,7 @@ class MRot3Test {
 		C.multiplyRight(A);
 		Rot3 expected = Rot3.of(0, 0, -Math.sqrt(0.5), Math.sqrt(0.5));
 
-		assertEquals(expected.x(), result.x(), ACCURACY);
-		assertEquals(expected.y(), result.y(), ACCURACY);
-		assertEquals(expected.z(), result.z(), ACCURACY);
-		assertEquals(expected.w(), result.w(), ACCURACY);
+		assertRotEquals(expected, result);
 	}
 
 	@Test
@@ -48,22 +46,26 @@ class MRot3Test {
 		A.slerp(C, 0.25);
 		Rot3 expected = Rot3.fromAxisAngle(Vec3.X_AXIS, Math.toRadians(45));
 
-		assertEquals(expected.x(), result.x(), ACCURACY);
-		assertEquals(expected.y(), result.y(), ACCURACY);
-		assertEquals(expected.z(), result.z(), ACCURACY);
-		assertEquals(expected.w(), result.w(), ACCURACY);
+		assertRotEquals(expected, result);
 	}
 
 	@Test
 	void nLerp() {
 		Rot3 result = A;
-		A.slerp(C, 0.5);
+		A.nLerp(C, 0.5);
 		Rot3 expected = Rot3.IDENTITY;
 
-		assertEquals(expected.x(), result.x(), ACCURACY);
-		assertEquals(expected.y(), result.y(), ACCURACY);
-		assertEquals(expected.z(), result.z(), ACCURACY);
-		assertEquals(expected.w(), result.w(), ACCURACY);
+		assertRotEquals(expected, result);
+	}
+
+	@Test
+	void nLerpThroughZero() {
+		Rot3 result = A;
+		Rot3 expected = A.copy();
+
+		A.nLerp(Rot3.of(-Math.sqrt(0.5), 0, 0, -Math.sqrt(0.5)), 0.5);
+
+		assertRotEquals(expected, result);
 	}
 
 	@Test
@@ -72,9 +74,6 @@ class MRot3Test {
 		A.invert();
 		Rot3 expected = C;
 
-		assertEquals(expected.x(), result.x(), ACCURACY);
-		assertEquals(expected.y(), result.y(), ACCURACY);
-		assertEquals(expected.z(), result.z(), ACCURACY);
-		assertEquals(expected.w(), result.w(), ACCURACY);
+		assertRotEquals(expected, result);
 	}
 }

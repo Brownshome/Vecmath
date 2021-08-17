@@ -9,6 +9,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class MRot2Test {
 	private MRot2 A;
 
+	private static void assertRotEquals(Rot2 expected, Rot2 result) {
+		assertEquals(1.0, Math.abs(expected.dot(result)), ACCURACY, "expected: %s but was: %s".formatted(expected, result));
+	}
+
 	@BeforeEach
 	void setUp() {
 		A = Rot2.fromAngle(Math.toRadians(20));
@@ -20,7 +24,6 @@ class MRot2Test {
 		Rot2 result = A;
 		Rot2 expected = Rot2.fromAngle(Math.toRadians(-20));
 
-		assertEquals(expected.sin(), result.sin(), ACCURACY);
-		assertEquals(expected.cos(), result.cos(), ACCURACY);
+		assertRotEquals(expected, result);
 	}
 }
