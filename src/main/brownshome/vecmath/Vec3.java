@@ -115,7 +115,7 @@ public interface Vec3 {
 
 	/** Gets an angle between this vector and the given vector in radians*/
 	default double angle(Vec3 vec) {
-		double angle = this.dot(vec) / (this.length() * vec.length());
+		double angle = this.dot(vec) / Math.sqrt(this.lengthSq() * vec.lengthSq());
 		angle = Math.acos(angle);
 		return angle;
 	}

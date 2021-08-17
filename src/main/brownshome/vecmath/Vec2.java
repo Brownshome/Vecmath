@@ -110,7 +110,7 @@ public interface Vec2 {
 	 * range [0, pi]
 	 **/
 	default double angle(Vec2 vec) {
-		double angle = this.dot(vec) / (this.length() * vec.length());
+		double angle = this.dot(vec) / Math.sqrt(this.lengthSq() * vec.lengthSq());
 		angle = Math.acos(angle);
 		return angle;
 	}
