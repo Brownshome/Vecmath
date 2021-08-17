@@ -30,6 +30,15 @@ public interface Vec2 {
 	}
 
 	/**
+	 * Creates a copy of the given vector
+	 * @param vec the vector to copy
+	 * @return the copy
+	 */
+	static MVec2 of(Vec2 vec) {
+		return new BasicVec2(vec);
+	}
+
+	/**
 	 * Creates a vector from the components in this array. Edits to the array will change the rotation and vice-versa
 	 * @param array the array
 	 * @return a vector

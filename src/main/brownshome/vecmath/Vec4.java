@@ -23,6 +23,15 @@ public interface Vec4 {
 	}
 
 	/**
+	 * Creates a copy of the given vector
+	 * @param vec the vector to copy
+	 * @return the copy
+	 */
+	static MVec4 of(Vec4 vec) {
+		return new BasicVec4(vec);
+	}
+
+	/**
 	 * Creates a vector from the components in this array. Edits to the array will change the rotation and vice-versa
 	 * @param array the array
 	 * @return a vector

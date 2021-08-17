@@ -36,6 +36,15 @@ public interface Vec3 {
 	}
 
 	/**
+	 * Creates a copy of the given vector
+	 * @param vec the vector to copy
+	 * @return the copy
+	 */
+	static MVec3 of(Vec3 vec) {
+		return new BasicVec3(vec);
+	}
+
+	/**
 	 * Creates a vector from the components in this array. Edits to the array will change the rotation and vice-versa
 	 * @param array the array
 	 * @return a vector
