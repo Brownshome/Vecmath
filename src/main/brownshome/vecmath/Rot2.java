@@ -4,6 +4,9 @@ import brownshome.vecmath.array.ArrayVec2;
 
 /** Represents a 2 dimensional rotation. Use this interface to represent a rotation that may be edited by the creator and no-one else. */
 public interface Rot2 extends Vec2 {
+	/**
+	 * A rotation of zero angle
+	 */
 	Rot2 IDENTITY = new BasicVec2(1, 0);
 
 	static MRot2 fromAngle(double angle) {
@@ -66,7 +69,7 @@ public interface Rot2 extends Vec2 {
 	 * it can return negative values for the angle. The result is in the range [ -pi, pi ]
 	 **/
 	default double angleTo(Rot2 o) {
-		//Looks terrible, but only uses one atan call.
+		//Looks terrible, but only uses one arc-tan call.
 		//It is a simplification of arg[(o.x + i * o.y) / (x + i * y)]
 		return Math.atan2(x() * o.y() - y() * o.x(), dot(o));
 	}
@@ -80,7 +83,7 @@ public interface Rot2 extends Vec2 {
 	}
 
 	/**
-	 * Returns an mutable copy of this object.
+	 * Returns a mutable copy of this object.
 	 **/
 	@Override
 	default MRot2 copy() {

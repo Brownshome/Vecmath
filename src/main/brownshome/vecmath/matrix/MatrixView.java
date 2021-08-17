@@ -4,7 +4,7 @@ import brownshome.vecmath.*;
 
 public interface MatrixView {
 	/**
-	 * Creates a matrix from a 2D array. Changes to the array will write through the the returned view. Neither dimension of
+	 * Creates a matrix from a 2D array. Changes to the array will write through to the returned view. Neither dimension of
 	 * this new matrix may be zero.
 	 * @param rows the rows of the new array
 	 * @return a matrix representing the array
@@ -443,7 +443,7 @@ public interface MatrixView {
 	/**
 	 * Computes this * other
 	 *
-	 * @param other the right hand side of the multiplication
+	 * @param other the right-hand side of the multiplication
 	 * @return this * other
 	 */
 	default Matrix multiply(MatrixView other) {

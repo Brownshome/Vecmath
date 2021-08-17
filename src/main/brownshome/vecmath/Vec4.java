@@ -3,10 +3,21 @@ package brownshome.vecmath;
 import brownshome.vecmath.array.ArrayVec3;
 import brownshome.vecmath.array.ArrayVec4;
 
-/** An interface representing a 4D vector. This can be used as a type representing a Vec4 that may be edited by the creator by by no-one else. */
+/** An interface representing a 4D vector. This can be used as a type representing a Vec4 that may be edited by the creator by no-one else. */
 public interface Vec4 {
+	/**
+	 * The vector (0, 0, 0, 0)
+	 */
 	Vec4 ZERO = new BasicVec4(0, 0, 0, 0);
 
+	/**
+	 * Creates a new vector with the given components
+	 * @param x the x component
+	 * @param y the y component
+	 * @param z the z component
+	 * @param w the w component
+	 * @return a newly created vector
+	 */
 	static MVec4 of(double x, double y, double z, double w) {
 		return new BasicVec4(x, y, z, w);
 	}
@@ -47,8 +58,8 @@ public interface Vec4 {
 	double w();
 	
 	/**
-	 * Calculates the distance squared from a this vector to another one
-	 * @param position The position to calculate the distance to to
+	 * Calculates the distance squared from this vector to another one
+	 * @param position The position to calculate the distance to
 	 */
 	default double distanceSq(Vec4 position) {
 		double dx = position.x() - x();
@@ -80,7 +91,7 @@ public interface Vec4 {
 	}
 	
 	/**
-	 * Calculates the distance from a this vector to another one
+	 * Calculates the distance from this vector to another one
 	 * @param position The position to calculate to
 	 */
 	default double distance(Vec4 position) {
@@ -99,7 +110,7 @@ public interface Vec4 {
 	}
 
 	/**
-	 * Returns an mutable copy of this object.
+	 * Returns a mutable copy of this object.
 	 **/
 	default MVec4 copy() {
 		return new BasicVec4(this);

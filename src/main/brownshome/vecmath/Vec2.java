@@ -2,12 +2,29 @@ package brownshome.vecmath;
 
 import brownshome.vecmath.array.ArrayVec2;
 
-/** An interface representing a 2D vector. This can be used as a type representing a Vec2 that may be edited by the creator by by no-one else. */
+/** An interface representing a 2D vector. This can be used as a type representing a Vec2 that may be edited by the creator by no-one else. */
 public interface Vec2 {
+	/**
+	 * The vector (0, 0)
+	 */
 	Vec2 ZERO = new BasicVec2(0, 0);
+
+	/**
+	 * The vector (1, 0)
+	 */
 	Vec2 X_AXIS = new BasicVec2(1, 0);
+
+	/**
+	 * The vector (0, 1)
+	 */
 	Vec2 Y_AXIS = new BasicVec2(0, 1);
 
+	/**
+	 * Creates a new vector with the given components
+	 * @param x the x component
+	 * @param y the y component
+	 * @return a newly created vector
+	 */
 	static MVec2 of(double x, double y) {
 		return new BasicVec2(x, y);
 	}
@@ -46,8 +63,8 @@ public interface Vec2 {
 	double y();
 	
 	/**
-	 * Calculates the distance squared from a this vector to another one
-	 * @param position The position to calculate the distance to to
+	 * Calculates the distance squared from this vector to another one
+	 * @param position The position to calculate the distance to
 	 */
 	default double distanceSq(Vec2 position) {
 		double dx = position.x() - x();
@@ -77,7 +94,7 @@ public interface Vec2 {
 	}
 	
 	/**
-	 * Calculates the distance from a this vector to another one
+	 * Calculates the distance from this vector to another one
 	 * @param position The position to calculate to
 	 */
 	default double distance(Vec2 position) {
@@ -99,7 +116,7 @@ public interface Vec2 {
 	}
 
 	/**
-	 * Returns an mutable copy of this object.
+	 * Returns a mutable copy of this object.
 	 **/
 	default MVec2 copy() {
 		return new BasicVec2(this);

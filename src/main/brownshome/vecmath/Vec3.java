@@ -2,13 +2,35 @@ package brownshome.vecmath;
 
 import brownshome.vecmath.array.ArrayVec3;
 
-/** An interface representing a 3D vector. This can be used as a type representing a Vec3 that may be edited by the creator by by no-one else. */
+/** An interface representing a 3D vector. This can be used as a type representing a Vec3 that may be edited by the creator by no-one else. */
 public interface Vec3 {
+	/**
+	 * The vector (0, 0, 0)
+	 */
 	Vec3 ZERO = new BasicVec3(0, 0, 0);
+
+	/**
+	 * The vector (1, 0, 0)
+	 */
 	Vec3 X_AXIS = new BasicVec3(1, 0, 0);
+
+	/**
+	 * The vector (0, 1, 0)
+	 */
 	Vec3 Y_AXIS = new BasicVec3(0, 1, 0);
+
+	/**
+	 * The vector (0, 0, 1)
+	 */
 	Vec3 Z_AXIS = new BasicVec3(0, 0, 1);
 
+	/**
+	 * Creates a new vector with the given components
+	 * @param x the x component
+	 * @param y the y component
+	 * @param z the z component
+	 * @return a newly created vector
+	 */
 	static MVec3 of(double x, double y, double z) {
 		return new BasicVec3(x, y, z);
 	}
@@ -48,8 +70,8 @@ public interface Vec3 {
 	double z();
 	
 	/**
-	 * Calculates the distance squared from a this vector to another one
-	 * @param position The position to calculate the distance to to
+	 * Calculates the distance squared from this vector to another one
+	 * @param position The position to calculate the distance to
 	 */
 	default double distanceSq(Vec3 position) {
 		double dx = position.x() - x();
@@ -80,7 +102,7 @@ public interface Vec3 {
 	}
 	
 	/**
-	 * Calculates the distance from a this vector to another one
+	 * Calculates the distance from this vector to another one
 	 * @param position The position to calculate to
 	 */
 	default double distance(Vec3 position) {
@@ -99,7 +121,7 @@ public interface Vec3 {
 	}
 
 	/**
-	 * Returns an mutable copy of this object.
+	 * Returns a mutable copy of this object.
 	 **/
 	default MVec3 copy() {
 		return new BasicVec3(this);

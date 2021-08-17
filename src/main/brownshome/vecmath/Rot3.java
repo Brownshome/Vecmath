@@ -5,6 +5,9 @@ import brownshome.vecmath.matrix.Matrix;
 
 /** Represents a 3 dimensional rotation. Use this interface to represent a rotation that may be edited by the creator and no-one else. */
 public interface Rot3 extends Vec4 {
+	/**
+	 * A rotation of zero angle
+	 */
 	Rot3 IDENTITY = new BasicVec4(0, 0, 0, 1);
 
 	/**
@@ -118,7 +121,7 @@ public interface Rot3 extends Vec4 {
 	}
 
 	/**
-	 * Returns an mutable copy of this object.
+	 * Returns a mutable copy of this object.
 	 **/
 	@Override
 	default MRot3 copy() {
