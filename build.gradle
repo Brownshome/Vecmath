@@ -1,6 +1,7 @@
 plugins {
 	id 'java-library'
 	id 'maven-publish'
+	id 'me.champeau.jmh' version '0.6.5'
 }
 
 group = 'brownshome'
@@ -11,8 +12,6 @@ repositories {
 }
 
 java {
-	modularity.inferModulePath = true
-
 	withJavadocJar()
 	withSourcesJar()
 }
@@ -20,6 +19,15 @@ java {
 sourceSets {
 	main.java.srcDirs = ['src/main']
 	test.java.srcDirs = ['src/test']
+	jmh.java.srcDirs = ['src/jmh']
+}
+
+jmh {
+	fork = 1
+	warmupIterations = 2
+	iterations = 5
+	benchmarkMode = ['AverageTime']
+	timeUnit = 'us'
 }
 
 publishing {
