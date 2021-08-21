@@ -228,6 +228,56 @@ public final class Matrix implements MatrixView {
 		}
 	}
 
+	/**
+	 * Sets this matrix to be <code>this * scale</code>, mutating this matrix
+	 * @param scale the scale to use
+	 */
+	public void scale(double scale) {
+		if (layoutIsContinuous()) {
+			for (int i = 0; i < rows * columns; i++) {
+				m[offset + i] *= scale;
+			}
+		} else {
+			for (int r = 0; r < rows; r++) for (int c = 0; c < columns; c++) {
+				m[index(r, c)] *= scale;
+			}
+		}
+	}
+
+	/**
+	 * Sets this matrix to be <code>other .* scale</code>, mutating this matrix
+	 * @param scale the scale to use
+	 */
+	public void scale(MatrixView scale) {
+		assert scale.columns() == columns && scale.rows() == rows;
+
+		if (scale instanceof Matrix matrix) {
+			scale(matrix);
+		} else {
+			slowScalePath(scale);
+		}
+	}
+
+	/**
+	 * Sets this matrix to be <code>other .* scale</code>, mutating this matrix
+	 * @param scale the scale to use
+	 */
+	public void scale(Matrix scale) {
+		if (scale.rowStride == rowStride && scale.columnStride == columnStride && layoutIsContinuous()) {
+			for (int i = 0; i < rows * columns; i++) {
+				m[offset + i] *= scale.m[scale.offset + i];
+			}
+		} else {
+			slowScalePath(scale);
+		}
+	}
+
+	private void slowScalePath(MatrixView scale) {
+		for (int r = 0; r < rows(); r++) for (int c = 0; c < columns(); c++) {
+			m[index(r, c)] *= scale.get(r, c);
+		}
+	}
+
 	public void set(double value, int row, int column) {
 		m[index(row, column)] = value;
 	}
