@@ -245,6 +245,38 @@ public interface MatrixView {
 
 				return new PermutationMatrix(columns).transpose();
 			}
+
+			@Override
+			public Factorisation factorise() {
+				var capturedThis = this;
+
+				return new Factorisation() {
+					@Override
+					public int size() {
+						return size;
+					}
+
+					@Override
+					public MatrixView leftSolve(MatrixView other) {
+						return other;
+					}
+
+					@Override
+					public MatrixView rightSolve(MatrixView other) {
+						return other;
+					}
+
+					@Override
+					public double determinant() {
+						return 1.0;
+					}
+
+					@Override
+					public MatrixView inverse() {
+						return capturedThis;
+					}
+				};
+			}
 		};
 	}
 
@@ -283,17 +315,55 @@ public interface MatrixView {
 				assert size == other.rows();
 
 				Matrix result = other.copy();
-
-				for (int i = 0; i < result.backingArray().length; i++) {
-					result.backingArray()[i] *= diagonal;
-				}
-
+				result.scale(diagonal);
 				return result;
 			}
 
 			@Override
 			public Matrix leftMultiply(MatrixView other) {
-				return multiply(other);
+				assert size == other.columns();
+
+				Matrix result = other.copy();
+				result.scale(diagonal);
+				return result;
+			}
+
+			@Override
+			public Factorisation factorise() {
+				return new Factorisation() {
+					@Override
+					public int size() {
+						return size;
+					}
+
+					@Override
+					public MatrixView leftSolve(MatrixView other) {
+						assert size == other.rows();
+
+						Matrix result = other.copy();
+						result.scale(1.0 / diagonal);
+						return result;
+					}
+
+					@Override
+					public MatrixView rightSolve(MatrixView other) {
+						assert size == other.columns();
+
+						Matrix result = other.copy();
+						result.scale(1.0 / diagonal);
+						return result;
+					}
+
+					@Override
+					public double determinant() {
+						return Math.pow(diagonal, size);
+					}
+
+					@Override
+					public MatrixView inverse() {
+						return MatrixView.diagonal(1.0 / diagonal, size);
+					}
+				};
 			}
 		};
 	}
@@ -341,6 +411,23 @@ public interface MatrixView {
 			public MatrixView permuteColumns(int... columns) {
 				return this;
 			}
+
+			@Override
+			public Factorisation factorise() {
+				assert rows == columns;
+
+				return new SingularFactorisation(rows);
+			}
+
+			@Override
+			public MatrixView leftDivide(MatrixView other) {
+				return this;
+			}
+
+			@Override
+			public MatrixView rightDivide(MatrixView other) {
+				return this;
+			}
 		};
 	}
 
@@ -376,6 +463,13 @@ public interface MatrixView {
 			@Override
 			public MatrixView permuteColumns(int... columns) {
 				return this;
+			}
+
+			@Override
+			public Factorisation factorise() {
+				assert rows == columns;
+
+				return new SingularFactorisation(rows);
 			}
 		};
 	}

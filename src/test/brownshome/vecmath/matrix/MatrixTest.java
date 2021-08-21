@@ -130,4 +130,100 @@ class MatrixTest {
 
 		assertSame(m, m.asMatrix());
 	}
+
+	@Test
+	void constant() {
+		Matrix result = Matrix.constant(5.0, 2, 3);
+		Matrix expected = Matrix.of(new double[] {
+				5.0, 5.0, 5.0,
+				5.0, 5.0, 5.0
+		}, 2, 3);
+
+		assertEquals(expected.rows(), result.rows());
+		assertEquals(expected.columns(), result.columns());
+		assertArrayEquals(expected.backingArray(), result.backingArray());
+	}
+
+	@Test
+	void identity() {
+		Matrix result = Matrix.identity(2);
+		Matrix expected = Matrix.of(new double[] {
+				1.0, 0.0,
+				0.0, 1.0
+		}, 2, 2);
+
+		assertEquals(expected.rows(), result.rows());
+		assertEquals(expected.columns(), result.columns());
+		assertArrayEquals(expected.backingArray(), result.backingArray());
+	}
+
+	@Test
+	void zeros() {
+		Matrix result = Matrix.zeros(2, 3);
+		Matrix expected = Matrix.of(new double[] {
+				0.0, 0.0, 0.0,
+				0.0, 0.0, 0.0,
+		}, 2, 3);
+
+		assertEquals(expected.rows(), result.rows());
+		assertEquals(expected.columns(), result.columns());
+		assertArrayEquals(expected.backingArray(), result.backingArray());
+	}
+
+	@Test
+	void diagonal() {
+		Matrix result = Matrix.diagonal(1.0, 2);
+		Matrix expected = Matrix.of(new double[] {
+				1.0, 0.0,
+				0.0, 1.0
+		}, 2, 2);
+
+		assertEquals(expected.rows(), result.rows());
+		assertEquals(expected.columns(), result.columns());
+		assertArrayEquals(expected.backingArray(), result.backingArray());
+	}
+
+	@Test
+	void scale() {
+		Matrix result = Matrix.identity(6);
+		result.scale(5.0);
+		Matrix expected = Matrix.diagonal(5.0, 6);
+
+		assertEquals(expected.rows(), result.rows());
+		assertEquals(expected.columns(), result.columns());
+		assertArrayEquals(expected.backingArray(), result.backingArray());
+	}
+
+	@Test
+	void scaleSlowPath() {
+		Matrix result = Matrix.identity(6).subMatrix(0, 0, 3, 3);
+		result.scale(5.0);
+		Matrix expected = Matrix.diagonal(5.0, 3);
+
+		assertEquals(expected.rows(), result.rows());
+		assertEquals(expected.columns(), result.columns());
+		assertArrayEquals(expected.backingArray(), result.copy().backingArray());
+	}
+
+	@Test
+	void scaleMatrix() {
+		Matrix result = Matrix.identity(6);
+		result.scale(Matrix.diagonal(5.0, 6));
+		Matrix expected = Matrix.diagonal(5.0, 6);
+
+		assertEquals(expected.rows(), result.rows());
+		assertEquals(expected.columns(), result.columns());
+		assertArrayEquals(expected.backingArray(), result.backingArray());
+	}
+
+	@Test
+	void scaleMatrixSlowPath() {
+		Matrix result = Matrix.identity(6);
+		result.scale(MatrixView.diagonal(5.0, 6));
+		Matrix expected = Matrix.diagonal(5.0, 6);
+
+		assertEquals(expected.rows(), result.rows());
+		assertEquals(expected.columns(), result.columns());
+		assertArrayEquals(expected.backingArray(), result.backingArray());
+	}
 }

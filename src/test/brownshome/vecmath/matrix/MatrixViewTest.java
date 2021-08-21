@@ -240,4 +240,119 @@ class MatrixViewTest {
 
 		assertEquals(expected, result);
 	}
+
+	@Test
+	void identityInverse() {
+		var result = MatrixView.identity(32).invert().asMatrix();
+		var expected = Matrix.identity(32);
+
+		assertEquals(expected.rows(), result.rows());
+		assertEquals(expected.columns(), result.columns());
+		assertArrayEquals(expected.backingArray(), result.copy().backingArray());
+	}
+
+	@Test
+	void identityDeterminant() {
+		var result = MatrixView.identity(32).determinant();
+		var expected = 1;
+
+		assertEquals(expected, result);
+	}
+
+	@Test
+	void divideByIdentity() {
+		var expected = Matrix.of(new double[] {
+				1, 3, .5, -3, 4, 0,
+				0, 0,  0,  0, 0, 0,
+				1, 3, .5, -3, 4, 0,
+				1, 3, .5, -3, 4, 0
+		}, 4, 6);
+
+		var result = expected.transpose().leftDivide(MatrixView.identity(6)).transpose();
+
+		assertEquals(expected.rows(), result.rows());
+		assertEquals(expected.columns(), result.columns());
+		assertArrayEquals(expected.backingArray(), result.copy().backingArray());
+
+		result = expected.rightDivide(MatrixView.identity(6));
+
+		assertEquals(expected.rows(), result.rows());
+		assertEquals(expected.columns(), result.columns());
+		assertArrayEquals(expected.backingArray(), result.copy().backingArray());
+	}
+
+	@Test
+	void diagonalInverse() {
+		var result = MatrixView.diagonal(4.0, 32).invert().asMatrix();
+		var expected = Matrix.diagonal(0.25, 32);
+
+		assertEquals(expected.rows(), result.rows());
+		assertEquals(expected.columns(), result.columns());
+		assertArrayEquals(expected.backingArray(), result.copy().backingArray());
+	}
+
+	@Test
+	void diagonalDeterminant() {
+		var result = MatrixView.diagonal(4.0, 6).determinant();
+		var expected = 4096.0;
+
+		assertEquals(expected, result);
+	}
+
+	@Test
+	void divideByDiagonal() {
+		var input = Matrix.of(new double[] {
+				1, 3, .5, -3, 4, 0,
+				0, 0,  0,  0, 0, 0,
+				1, 3, .5, -3, 4, 0,
+				1, 3, .5, -3, 4, 0
+		}, 4, 6);
+
+		var expected = Matrix.of(new double[] {
+				.2, .6, .1, -.6, .8, 0,
+				 0,  0,  0,   0,  0, 0,
+				.2, .6, .1, -.6, .8, 0,
+				.2, .6, .1, -.6, .8, 0,
+		}, 4, 6);
+
+		var result = input.transpose().leftDivide(MatrixView.diagonal(5.0, 6)).transpose();
+
+		assertEquals(expected.rows(), result.rows());
+		assertEquals(expected.columns(), result.columns());
+		assertArrayEquals(expected.backingArray(), result.copy().backingArray(), ACCURACY);
+
+		result = input.rightDivide(MatrixView.diagonal(5.0, 6));
+
+		assertEquals(expected.rows(), result.rows());
+		assertEquals(expected.columns(), result.columns());
+		assertArrayEquals(expected.backingArray(), result.copy().backingArray(), ACCURACY);
+	}
+
+	@Test
+	void divideZero() {
+		var expected = Matrix.zeros(6, 6);
+		var result = MatrixView.zeros(6, 6).rightDivide(MatrixView.identity(6)).asMatrix();
+
+		assertEquals(expected.rows(), result.rows());
+		assertEquals(expected.columns(), result.columns());
+		assertArrayEquals(expected.backingArray(), result.copy().backingArray(), ACCURACY);
+
+		result = MatrixView.zeros(6, 6).leftDivide(MatrixView.identity(6)).asMatrix();
+
+		assertEquals(expected.rows(), result.rows());
+		assertEquals(expected.columns(), result.columns());
+		assertArrayEquals(expected.backingArray(), result.copy().backingArray(), ACCURACY);
+	}
+
+	@Test
+	void zeroMatrixIsSingular() {
+		var expected = 0;
+		var result = MatrixView.zeros(6, 6).determinant();
+
+		assertEquals(expected, result);
+
+		assertThrows(SingularMatrixException.class, () -> MatrixView.zeros(6, 6).invert());
+		assertThrows(SingularMatrixException.class, () -> MatrixView.identity(6).leftDivide(MatrixView.zeros(6, 6)));
+		assertThrows(SingularMatrixException.class, () -> MatrixView.identity(6).rightDivide(MatrixView.zeros(6, 6)));
+	}
 }
