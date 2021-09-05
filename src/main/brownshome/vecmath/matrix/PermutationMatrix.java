@@ -31,7 +31,7 @@ class PermutationMatrix implements MatrixViewWithFastMultiply {
 
 	@Override
 	public Matrix leftMultiply(MatrixView other) {
-		return other.permuteColumns(rows).copy();
+		return other.permuteColumns(PermutationUtil.invertPermutation(rows)).copy();
 	}
 
 	@Override

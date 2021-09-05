@@ -123,7 +123,7 @@ final class LUFactorisation implements Factorisation {
 		// Rows of B
 		for (int r = 0; r < answer.rows(); r++) {
 
-			// Solve yU = PB
+			// Solve zU = B
 			for (int c = 0; c < size(); c++) {
 				double value = answer.get(r, c);
 
@@ -135,7 +135,7 @@ final class LUFactorisation implements Factorisation {
 				answer.set(value / decomposition.get(c, c), r, c);
 			}
 
-			// Solve xL = y
+			// Solve yL = z
 			for (int c = size() - 1; c >= 0; c--) {
 				double value = answer.get(r, c);
 
@@ -148,6 +148,7 @@ final class LUFactorisation implements Factorisation {
 			}
 		}
 
+		// Solve y / P = x
 		return answer.multiply(permutation);
 	}
 

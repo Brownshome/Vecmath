@@ -56,6 +56,30 @@ class LUFactorisationTest {
 	}
 
 	@Test
+	void rightSolveNonSymmetricalPermutation() {
+		double[] expected = new double[] {
+				.5, -.5, .5,
+				-2.75, 1.75, .75
+		};
+
+		Matrix a = Matrix.of(new double[] {
+				0.0, -1.0, 0.5,
+				-1.0, -1.0, .5,
+				1.0, 0.0, 1.0
+		}, 3, 3);
+
+		Matrix b = Matrix.of(new double[] {
+				1, 0, .5,
+				-1, 1, .25
+		}, 2, 3);
+
+		var factorisation = new LUFactorisation(a, 0.0);
+		var result = factorisation.rightSolve(b).asMatrix().backingArray();
+
+		assertArrayEquals(expected, result, CompareConstant.ACCURACY);
+	}
+
+	@Test
 	void inverse() {
 		double[] expected = new double[] {
 				0, 0, .5,

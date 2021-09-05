@@ -69,7 +69,7 @@ class PermutationMatrixTest {
 	void rightSolve() {
 		var result = new PermutationMatrix(new int[] { 2, 0, 1 })
 				.factorise().rightSolve(Matrix.of(new double[] { 4, 1, 2, 1, 2, 3 }, 2, 3));
-		var expected = Matrix.of(new double[] { 1, 2, 4, 2, 3, 1 }, 2, 3);
+		var expected = Matrix.of(new double[] { 2, 4, 1, 3, 1, 2 }, 2, 3);
 
 		assertEquals(expected.rows(), result.rows());
 		assertEquals(expected.columns(), result.columns());
