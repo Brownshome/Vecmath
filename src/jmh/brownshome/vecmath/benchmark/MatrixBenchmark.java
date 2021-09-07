@@ -10,7 +10,7 @@ public class MatrixBenchmark {
 	public static class MatrixData {
 		private static final int SEED = 1245;
 
-		@Param({"8", "64", "512"})
+		@Param({"8", "32", "128"})
 		public int size;
 
 		private Matrix A, B;
