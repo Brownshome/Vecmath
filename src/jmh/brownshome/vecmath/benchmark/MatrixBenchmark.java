@@ -14,6 +14,7 @@ public class MatrixBenchmark {
 		public int size;
 
 		private Matrix A, B;
+		private Factorisation factorisation;
 
 		@Setup
 		public void setup() {
@@ -25,6 +26,8 @@ public class MatrixBenchmark {
 				A.backingArray()[i] = random.nextDouble();
 				B.backingArray()[i] = random.nextDouble();
 			}
+
+			factorisation = A.factorise();
 		}
 	}
 
@@ -36,6 +39,11 @@ public class MatrixBenchmark {
 	@Benchmark
 	public Factorisation factoriseMatrix(MatrixData data) {
 		return data.A.factorise();
+	}
+
+	@Benchmark
+	public MatrixView solve(MatrixData data) {
+		return data.factorisation.leftSolve(data.B);
 	}
 
 	@Benchmark
