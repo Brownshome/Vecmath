@@ -11,9 +11,9 @@ final class LUFactorisation implements Factorisation {
 	 */
 	private final MatrixView decomposition;
 	private final MatrixView permutation;
-	private final int determinantPolarity;
+	private final double determinant;
 
-	public LUFactorisation(Matrix matrix, double tolerance) {
+	LUFactorisation(Matrix matrix, double tolerance) {
 		assert matrix.columns() == matrix.rows();
 
 		int[] permutation = new int[matrix.columns()];
@@ -21,19 +21,21 @@ final class LUFactorisation implements Factorisation {
 			permutation[i] = i;
 		}
 
-		determinantPolarity = performFactorisation(matrix, permutation, tolerance);
+		determinant = performFactorisation(matrix, permutation, tolerance);
 		decomposition = matrix.permuteRows(permutation);
 		this.permutation = new PermutationMatrix(permutation);
 	}
 
-	private static int performFactorisation(Matrix decomposition, int[] permutations, double tolerance) {
+	private static double performFactorisation(Matrix decomposition, int[] permutations, double tolerance) {
 		int size = permutations.length;
-		int determinantScalar = 1;
+		double determinant = 1.0;
 
 		// Eliminate the values below the diagonal
 		for (int c = 0; c < size; c++) {
+			int columnIndex = permutations[c];
+
 			// Find the max element
-			double max = decomposition.get(permutations[c], c);
+			double max = decomposition.get(columnIndex, c);
 			int maxRow = c;
 			for (int r = c + 1; r < size; r++) {
 				double value = decomposition.get(permutations[r], c);
@@ -48,28 +50,33 @@ final class LUFactorisation implements Factorisation {
 				throw new SingularMatrixException();
 			}
 
+			determinant *= max;
+
 			// Pivot the rows
 			if (maxRow != c) {
-				int swap = permutations[c];
 				permutations[c] = permutations[maxRow];
-				permutations[maxRow] = swap;
-				determinantScalar = -determinantScalar;
+				permutations[maxRow] = columnIndex;
+				determinant = -determinant;
+
+				columnIndex = permutations[c];
 			}
 
 			// Subtract the greatest row for each row under it
 			for (int r = c + 1; r < size; r++) {
-				double valueAtColumn = decomposition.get(permutations[r], c) / max;
-				decomposition.set(valueAtColumn, permutations[r], c);
+				int rowIndex = permutations[r];
+
+				double valueAtColumn = decomposition.get(rowIndex, c) / max;
+				decomposition.set(valueAtColumn, rowIndex, c);
 
 				for (int k = c + 1; k < size; k++) {
-					double value = decomposition.get(permutations[r], k);
-					double maxRowValue = decomposition.get(permutations[c], k);
-					decomposition.set(value - valueAtColumn * maxRowValue, permutations[r], k);
+					double value = decomposition.get(rowIndex, k);
+					double maxRowValue = decomposition.get(columnIndex, k);
+					decomposition.set(value - valueAtColumn * maxRowValue, rowIndex, k);
 				}
 			}
 		}
 
-		return determinantScalar;
+		return determinant;
 	}
 
 	@Override
@@ -154,13 +161,6 @@ final class LUFactorisation implements Factorisation {
 
 	@Override
 	public double determinant() {
-		// Product of diagonal elements of the U matrix
-		double determinant = decomposition.get(0, 0) * determinantPolarity;
-
-		for (int rc = 1; rc < size(); rc++) {
-			determinant *= decomposition.get(rc, rc);
-		}
-
 		return determinant;
 	}
 }
