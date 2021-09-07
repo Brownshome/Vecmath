@@ -26,7 +26,7 @@ class LUFactorisationTest {
 		}, 2, 3).transpose();
 
 		var factorisation = new LUFactorisation(a, 0.0);
-		var result = factorisation.leftSolve(b).asMatrix().backingArray();
+		var result = factorisation.leftSolve(b).copy().backingArray();
 
 		assertArrayEquals(expected, result, CompareConstant.ACCURACY);
 	}
@@ -50,7 +50,7 @@ class LUFactorisationTest {
 		}, 2, 3);
 
 		var factorisation = new LUFactorisation(a, 0.0);
-		var result = factorisation.rightSolve(b).asMatrix().backingArray();
+		var result = factorisation.rightSolve(b).copy().backingArray();
 
 		assertArrayEquals(expected, result, CompareConstant.ACCURACY);
 	}
@@ -74,7 +74,7 @@ class LUFactorisationTest {
 		}, 2, 3);
 
 		var factorisation = new LUFactorisation(a, 0.0);
-		var result = factorisation.rightSolve(b).asMatrix().backingArray();
+		var result = factorisation.rightSolve(b).copy().backingArray();
 
 		assertArrayEquals(expected, result, CompareConstant.ACCURACY);
 	}
@@ -94,7 +94,7 @@ class LUFactorisationTest {
 		}, 3, 3);
 
 		var factorisation = new LUFactorisation(a, 0.0);
-		var result = factorisation.inverse().asMatrix().backingArray();
+		var result = factorisation.inverse().copy().backingArray();
 
 		assertArrayEquals(expected, result, CompareConstant.ACCURACY);
 	}

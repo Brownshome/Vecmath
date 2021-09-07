@@ -22,8 +22,8 @@ final class LUFactorisation implements Factorisation {
 		}
 
 		determinant = performFactorisation(matrix, permutation, tolerance);
-		decomposition = matrix.permuteRows(permutation);
 		this.permutation = new PermutationMatrix(permutation);
+		decomposition = this.permutation.multiply(matrix);
 	}
 
 	private static double performFactorisation(Matrix decomposition, int[] permutations, double tolerance) {
