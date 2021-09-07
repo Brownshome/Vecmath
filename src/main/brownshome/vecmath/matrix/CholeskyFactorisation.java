@@ -38,14 +38,12 @@ final class CholeskyFactorisation implements Factorisation {
 		double determinant = 1.0;
 		double[] m = s.backingArray();
 
-		for (int r = 0, rowStart = 0; r < s.rows();  r++, rowStart += r) {
-			int indexD = rowStart + r;
-
+		for (int r = 0; r < s.size(); r++) {
 			// Find the largest diagonal element remaining to pivot
 			int maxIndex = r;
-			double max = Math.abs(m[indexD]);
-			for (int i = r + 1, d = indexD + 1; i < s.rows(); i++, d += i) {
-				double x = Math.abs(m[d + i]);
+			double max = Math.abs(m[s.index(r, r)]);
+			for (int i = r + 1; i < s.size(); i++) {
+				double x = Math.abs(m[s.index(i, i)]);
 				if (x > max) {
 					max = x;
 					maxIndex = i;
@@ -55,7 +53,7 @@ final class CholeskyFactorisation implements Factorisation {
 			// Pivot
 			pivot(s, r, maxIndex);
 
-			double diag = m[indexD];
+			double diag = m[s.index(r, r)];
 
 			if (Math.abs(diag) < tolerance) {
 				throw new SingularMatrixException();
@@ -69,21 +67,20 @@ final class CholeskyFactorisation implements Factorisation {
 			}
 
 			// Compute all L values in this column
-			for (int k = r + 1, lRowStart = rowStart + k; k < s.rows(); k++, lRowStart += k) {
-				int indexL = lRowStart + r;
-				double l = m[indexL];
+			for (int k = r + 1; k < s.rows(); k++) {
+				double l = m[s.index(k, r)];
 
-				for (int c = 0, d = 0; c < r; c++, d += c) {
-					l -= m[rowStart + c] * m[lRowStart + c] * m[d + c];
+				for (int c = 0; c < r; c++) {
+					l -= m[s.index(r, c)] * m[s.index(k, c)] * m[s.index(c, c)];
 				}
 
-				m[indexL] = l / diag;
+				m[s.index(k, r)] = l / diag;
 			}
 
 			// Adjust other diagonal values using the new diagonal value
-			for (int i = r + 1, dRowStart = rowStart + i; i < s.rows(); i++, dRowStart += i) {
-				double lVal = m[dRowStart + r];
-				m[dRowStart + i] -= diag * lVal * lVal;
+			for (int i = r + 1; i < s.rows(); i++) {
+				double lVal = m[s.index(i, r)];
+				m[s.index(i, i)] -= diag * lVal * lVal;
 			}
 		}
 
@@ -102,37 +99,32 @@ final class CholeskyFactorisation implements Factorisation {
 			return;
 		}
 
-		int indexA = SymmetricMatrix.index(a, 0), indexB = SymmetricMatrix.index(b, 0);
-
 		// (a, a) <-> (b, b)
 		{
-			double tmp = m[indexA + a];
-			m[indexA + a] = m[indexB + b];
-			m[indexB + b] = tmp;
+			double tmp = m[s.index(a, a)];
+			m[s.index(a, a)] = m[s.index(b, b)];
+			m[s.index(b, b)] = tmp;
 		}
 
 		// (a, i) <-> (b, i) [i < a]
 		for (int i = 0; i < a; i++) {
-			double tmp = m[indexA + i];
-			m[indexA + i] = m[indexB + i];
-			m[indexB + i] = tmp;
+			double tmp = m[s.index(a, i)];
+			m[s.index(a, i)] = m[s.index(b, i)];
+			m[s.index(b, i)] = tmp;
 		}
 
 		// (i, a) <-> (b, i) [a < i < b]
-		indexA = SymmetricMatrix.index(a + 1, a);
-		for (int i = a + 1; i < b; i++, indexA += i) {
-			double tmp = m[indexA];
-			m[indexA] = m[indexB + i];
-			m[indexB + i] = tmp;
+		for (int i = a + 1; i < b; i++) {
+			double tmp = m[s.index(i, a)];
+			m[s.index(i, a)] = m[s.index(b, i)];
+			m[s.index(b, i)] = tmp;
 		}
 
 		// (i, b) <-> (i, a) [b < i]
-		indexB = SymmetricMatrix.index(b + 1, b);
-		indexA += b + 1;
-		for (int i = b + 1; i < s.rows(); i++, indexA += i, indexB += i) {
-			double tmp = m[indexA];
-			m[indexA] = m[indexB];
-			m[indexB] = tmp;
+		for (int i = b + 1; i < s.rows(); i++) {
+			double tmp = m[s.index(i, a)];
+			m[s.index(i, a)] = m[s.index(i, b)];
+			m[s.index(i, b)] = tmp;
 		}
 	}
 
@@ -145,33 +137,32 @@ final class CholeskyFactorisation implements Factorisation {
 	public MatrixView leftSolve(MatrixView other) {
 		assert size() == other.rows();
 
-		double[] m = decomposition.backingArray();
+		var s = decomposition;
+		double[] m = s.backingArray();
 		var answer = permutation.multiply(other).asMatrix();
 
 		// Columns of PB
 		for (int c = 0; c < answer.columns(); c++) {
 
 			// Solve Ly = PB
-			int rowStart = 0;
-			for (int r = 0; r < size(); r++, rowStart += r) {
+			for (int r = 0; r < size(); r++) {
 				double value = answer.get(r, c);
 
 				// Columns of L
 				for (int k = 0; k < r; k++) {
-					value -= m[rowStart + k] * answer.get(k, c);
+					value -= m[s.index(r, k)] * answer.get(k, c);
 				}
 
 				answer.set(value, r, c);
 			}
 
 			// Solve L'x = D⁻¹y
-			rowStart -= size();
-			for (int r = size() - 1; r >= 0; rowStart -= r, r--) {
-				double value = answer.get(r, c) / m[rowStart + r];
+			for (int r = size() - 1; r >= 0; r--) {
+				double value = answer.get(r, c) / m[s.index(r, r)];
 
 				// Column of L'
-				for (int k = r + 1, columnStart = rowStart + k; k < size(); k++, columnStart += k) {
-					value -= m[columnStart + r] * answer.get(k, c);
+				for (int k = r + 1; k < size(); k++) {
+					value -= m[s.index(k, r)] * answer.get(k, c);
 				}
 
 				answer.set(value, r, c);
@@ -185,33 +176,32 @@ final class CholeskyFactorisation implements Factorisation {
 	public MatrixView rightSolve(MatrixView other) {
 		assert size() == other.columns();
 
-		double[] m = decomposition.backingArray();
+		var s = decomposition;
+		double[] m = s.backingArray();
 		var answer = other.multiply(permutation.transpose()).asMatrix();
 
 		// Rows of BP'
 		for (int r = 0; r < answer.rows(); r++) {
 
 			// Solve yL' = BP'
-			int columnStart = 0;
-			for (int c = 0; c < size(); c++, columnStart += c) {
+			for (int c = 0; c < size(); c++) {
 				double value = answer.get(r, c);
 
 				// Rows of L
 				for (int k = 0; k < c; k++) {
-					value -= m[columnStart + k] * answer.get(r, k);
+					value -= m[s.index(c, k)] * answer.get(r, k);
 				}
 
 				answer.set(value, r, c);
 			}
 
 			// Solve xL = yD⁻¹
-			columnStart -= size();
-			for (int c = size() - 1; c >= 0; columnStart -= c, c--) {
-				double value = answer.get(r, c) / m[columnStart + c];
+			for (int c = size() - 1; c >= 0; c--) {
+				double value = answer.get(r, c) / m[s.index(c, c)];
 
 				// Row of L
-				for (int k = c + 1, rowStart = columnStart + k; k < size(); k++, rowStart += k) {
-					value -= m[rowStart + c] * answer.get(r, k);
+				for (int k = c + 1; k < size(); k++) {
+					value -= m[s.index(k, c)] * answer.get(r, k);
 				}
 
 				answer.set(value, r, c);

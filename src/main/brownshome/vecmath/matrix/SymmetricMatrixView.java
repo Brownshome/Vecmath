@@ -23,4 +23,20 @@ public interface SymmetricMatrixView extends MatrixView {
 	default Factorisation factorise() {
 		return new CholeskyFactorisation(SymmetricMatrix.of(this), 1e-10);
 	}
+
+	/**
+	 * Returns the number of rows and columns in this matrix
+	 * @return the size of this matrix
+	 */
+	int size();
+
+	@Override
+	default int rows() {
+		return size();
+	}
+
+	@Override
+	default int columns() {
+		return size();
+	}
 }

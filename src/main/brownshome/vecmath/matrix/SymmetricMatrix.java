@@ -1,12 +1,16 @@
 package brownshome.vecmath.matrix;
 
+import java.util.Arrays;
+
 final class SymmetricMatrix implements SymmetricMatrixView {
 	private final int size;
 
-	// Stored in row-major format, only storing the first N values of each row
+	// Stored in row-major format, ignoring elements above the main diagonal
 	private final double[] matrix;
 
 	private SymmetricMatrix(double[] m, int size) {
+		assert m.length == size * size;
+
 		this.matrix = m;
 		this.size = size;
 	}
@@ -24,13 +28,13 @@ final class SymmetricMatrix implements SymmetricMatrixView {
 	}
 
 	private static int backingArrayLength(int size) {
-		return index(size, 0);
+		return size * size;
 	}
 
-	static int index(int r, int c) {
+	int index(int r, int c) {
 		assert c <= r;
 
-		return r * (r + 1) / 2 + c;
+		return r * size + c;
 	}
 
 	static SymmetricMatrix of(MatrixView m) {
@@ -38,9 +42,11 @@ final class SymmetricMatrix implements SymmetricMatrixView {
 
 		double[] array = new double[backingArrayLength(m.rows())];
 
+		var result = new SymmetricMatrix(array, m.rows());
+
 		for (int r = 0; r < m.rows(); r++) {
 			for (int c = 0; c <= r; c++) {
-				array[index(r, c)] = m.get(r, c);
+				array[result.index(r, c)] = m.get(r, c);
 			}
 		}
 
@@ -60,10 +66,15 @@ final class SymmetricMatrix implements SymmetricMatrixView {
 			return of((MatrixView) m);
 		}
 
-		double[] array = new double[backingArrayLength(m.rows())];
+		double[] array;
+		if (stride == m.rows()) {
+			array = Arrays.copyOfRange(m.backingArray(), m.offset(), m.offset() + backingArrayLength(m.rows()));
+		} else {
+			array = new double[backingArrayLength(m.rows())];
 
-		for (int r = 0; r < m.rows(); r++) {
-			System.arraycopy(m.backingArray(), m.offset() + stride * r, array, index(r, 0), r + 1);
+			for (int r = 0; r < m.rows(); r++) {
+				System.arraycopy(m.backingArray(), m.offset() + stride * r, array, r * m.rows(), r + 1);
+			}
 		}
 
 		return new SymmetricMatrix(array, m.rows());
@@ -74,12 +85,7 @@ final class SymmetricMatrix implements SymmetricMatrixView {
 	}
 
 	@Override
-	public int rows() {
-		return size;
-	}
-
-	@Override
-	public int columns() {
+	public int size() {
 		return size;
 	}
 
@@ -94,10 +100,9 @@ final class SymmetricMatrix implements SymmetricMatrixView {
 
 	@Override
 	public Matrix copy() {
-		double[] array = new double[size * size];
+		double[] array = matrix.clone();
 
 		for (int r = 0; r < size; r++) {
-			System.arraycopy(matrix, index(r, 0), array, r * size, r + 1);
 			for (int c = r + 1; c < size; c++) {
 				array[r * size + c] = matrix[index(c, r)];
 			}

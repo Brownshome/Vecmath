@@ -9,8 +9,8 @@ class SymmetricMatrixTest {
 	@Test
 	void get() {
 		var a = SymmetricMatrix.of(new double[] {
-				0,
-				1, .5,
+				0, 0, 0,
+				1, .5, 0,
 				1, -1, 2
 		}, 3);
 
@@ -21,8 +21,8 @@ class SymmetricMatrixTest {
 	@Test
 	void copy() {
 		var result = SymmetricMatrix.of(new double[] {
-				0,
-				1, .5,
+				0, 0, 0,
+				1, .5, 0,
 				1, -1, 2
 		}, 3).copy();
 		var expected = Matrix.of(new double[] {
@@ -39,8 +39,8 @@ class SymmetricMatrixTest {
 	@Test
 	void transpose() {
 		var expected = SymmetricMatrix.of(new double[] {
-				0,
-				1, .5,
+				0, 0, 0,
+				1, .5, 0,
 				1, -1, 2
 		}, 3);
 
@@ -50,8 +50,8 @@ class SymmetricMatrixTest {
 	@Test
 	void factorise() {
 		var result = SymmetricMatrix.of(new double[] {
-				0,
-				1, .5,
+				0, 0, 0,
+				1, .5, 0,
 				1, -1, 2
 		}, 3).factorise();
 

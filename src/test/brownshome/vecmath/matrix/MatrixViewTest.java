@@ -358,18 +358,22 @@ class MatrixViewTest {
 
 	@Test
 	void asSymmetricMatrix() {
-		var expected = new double[] {
-				0,
-				1, -.5,
-				2, -1, 1.5
-		};
-
 		var result = Matrix.of(new double[] {
 				0, 1, 2,
 				1, -.5, -1,
 				2, -1, 1.5
 		}, 3, 3).asSymmetricMatrix();
 
-		assertArrayEquals(expected, ((SymmetricMatrix) result).backingArray());
+		assertEquals(0, result.get(0, 0));
+		assertEquals(1, result.get(1, 0));
+		assertEquals(2, result.get(2, 0));
+
+		assertEquals(1, result.get(0, 1));
+		assertEquals(-.5, result.get(1, 1));
+		assertEquals(-1, result.get(2, 1));
+
+		assertEquals(2, result.get(0, 2));
+		assertEquals(-1, result.get(1, 2));
+		assertEquals(1.5, result.get(2, 2));
 	}
 }

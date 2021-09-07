@@ -19,8 +19,8 @@ public class SymmetricMatrixBenchmark {
 		@Setup
 		public void setup() {
 			Random random = new Random(SEED);
-			var arrayA = new double[size * (size + 1) / 2];
-			var arrayB = new double[size * (size + 1) / 2];
+			var arrayA = new double[size * size];
+			var arrayB = new double[size * size];
 
 			for (int i = 0; i < arrayA.length; i++) {
 				arrayA[i] = random.nextDouble();
