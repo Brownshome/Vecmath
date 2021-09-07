@@ -569,6 +569,15 @@ public interface MatrixView {
 	}
 
 	/**
+	 * Returns this matrix as a {@link SymmetricMatrixView} if it is one, or copies it into a symmetric form. This
+	 * method must only be called on matrices that are perfectly symmetric.
+	 * @return A symmetric matrix that may or may not be this matrix
+	 */
+	default SymmetricMatrixView asSymmetricMatrix() {
+		return SymmetricMatrix.of(this);
+	}
+
+	/**
 	 * Returns this matrix as a scalar. If this matrix is not a single value and assertions are
 	 * turned on an assertion error will be thrown. This method should only be used on matrix that
 	 * have one row and one column
