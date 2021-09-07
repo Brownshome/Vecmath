@@ -16,6 +16,10 @@ java {
 	withSourcesJar()
 }
 
+tasks.withType(JavaCompile) {
+	options.encoding = 'utf-8'
+}
+
 sourceSets {
 	main.java.srcDirs = ['src/main']
 	test.java.srcDirs = ['src/test']

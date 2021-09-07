@@ -355,4 +355,21 @@ class MatrixViewTest {
 		assertThrows(SingularMatrixException.class, () -> MatrixView.identity(6).leftDivide(MatrixView.zeros(6, 6)));
 		assertThrows(SingularMatrixException.class, () -> MatrixView.identity(6).rightDivide(MatrixView.zeros(6, 6)));
 	}
+
+	@Test
+	void asSymmetricMatrix() {
+		var expected = new double[] {
+				0,
+				1, -.5,
+				2, -1, 1.5
+		};
+
+		var result = Matrix.of(new double[] {
+				0, 1, 2,
+				1, -.5, -1,
+				2, -1, 1.5
+		}, 3, 3).asSymmetricMatrix();
+
+		assertArrayEquals(expected, ((SymmetricMatrix) result).backingArray());
+	}
 }

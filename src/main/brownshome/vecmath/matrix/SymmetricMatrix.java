@@ -33,10 +33,6 @@ final class SymmetricMatrix implements SymmetricMatrixView {
 		return r * (r + 1) / 2 + c;
 	}
 
-	static SymmetricMatrix of(SymmetricMatrix o) {
-		return new SymmetricMatrix(o.matrix.clone(), o.size);
-	}
-
 	static SymmetricMatrix of(MatrixView m) {
 		assert m.rows() == m.columns() && isSymmetric(m);
 
@@ -73,7 +69,7 @@ final class SymmetricMatrix implements SymmetricMatrixView {
 		return new SymmetricMatrix(array, m.rows());
 	}
 
-	static MatrixView of(double[] matrix, int rows) {
+	static SymmetricMatrix of(double[] matrix, int rows) {
 		return new SymmetricMatrix(matrix, rows);
 	}
 
@@ -115,11 +111,6 @@ final class SymmetricMatrix implements SymmetricMatrixView {
 		return this;
 	}
 
-	@Override
-	public Factorisation factorise() {
-		return SymmetricMatrixView.super.factorise();
-	}
-
 	double[] backingArray() {
 		return matrix;
 	}
@@ -127,5 +118,10 @@ final class SymmetricMatrix implements SymmetricMatrixView {
 	@Override
 	public String toString() {
 		return MatrixView.toString(this);
+	}
+
+	@Override
+	public Factorisation factorise() {
+		return new CholeskyFactorisation(new SymmetricMatrix(matrix, size), 1e-10);
 	}
 }
