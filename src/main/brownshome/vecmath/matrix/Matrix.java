@@ -325,19 +325,12 @@ public final class Matrix implements MatrixView {
 	}
 
 	@Override
+	public SymmetricMatrixView asSymmetricMatrix() {
+		return SymmetricMatrix.of(this);
+	}
+
+	@Override
 	public String toString() {
-		StringBuilder output = new StringBuilder("Matrix [\n");
-
-		for (int r = 0; r < rows(); r++) {
-			for (int c = 0; c < columns(); c++) {
-				output.append(String.format("\t%+.2f", get(r, c)));
-			}
-
-			output.append('\n');
-		}
-
-		output.append(']');
-
-		return output.toString();
+		return MatrixView.toString(this);
 	}
 }

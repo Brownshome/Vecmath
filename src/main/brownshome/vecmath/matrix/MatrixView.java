@@ -644,4 +644,25 @@ public interface MatrixView {
 	default double determinant() {
 		return factorise().determinant();
 	}
+
+	/**
+	 * Formats a matrix as a string
+	 * @param m the martix to format
+	 * @return the string
+	 */
+	static String toString(MatrixView m) {
+		StringBuilder output = new StringBuilder("Matrix [\n");
+
+		for (int r = 0; r < m.rows(); r++) {
+			for (int c = 0; c < m.columns(); c++) {
+				output.append(String.format("\t%+.2f", m.get(r, c)));
+			}
+
+			output.append('\n');
+		}
+
+		output.append(']');
+
+		return output.toString();
+	}
 }

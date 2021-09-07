@@ -69,4 +69,9 @@ final class PermutedMatrixView implements MatrixView {
 	public MatrixView transpose() {
 		return of(delegate.transpose(), columns, rows);
 	}
+
+	@Override
+	public String toString() {
+		return MatrixView.toString(this);
+	}
 }

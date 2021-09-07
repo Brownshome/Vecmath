@@ -36,4 +36,9 @@ class TransposedMatrixView implements MatrixView {
 	public MatrixView invert() {
 		return delegate.invert().transpose();
 	}
+
+	@Override
+	public String toString() {
+		return MatrixView.toString(this);
+	}
 }

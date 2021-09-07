@@ -107,4 +107,9 @@ class PermutationMatrix implements MatrixViewWithFastMultiply {
 			}
 		};
 	}
+
+	@Override
+	public String toString() {
+		return MatrixView.toString(this);
+	}
 }

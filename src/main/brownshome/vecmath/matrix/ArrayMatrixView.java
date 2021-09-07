@@ -28,4 +28,9 @@ final class ArrayMatrixView implements MatrixView {
 	public double get(int row, int column) {
 		return array[row][column];
 	}
+
+	@Override
+	public String toString() {
+		return MatrixView.toString(this);
+	}
 }
