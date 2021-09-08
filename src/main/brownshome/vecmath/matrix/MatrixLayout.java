@@ -92,8 +92,7 @@ public record MatrixLayout(int rows, int columns, int rowStride, int columnStrid
 	 * @see MatrixLayout#isOptimal()
 	 */
 	public static MatrixLayout optimal(int rows, int columns) {
-		int rowStride = VectorisationUtil.roundUpToVectorLength(columns);
-		return new MatrixLayout(rows, columns, VectorisationUtil.roundUpToVectorLength(columns), 1, 0, rowStride * rows);
+		return rowMajor(rows, columns);
 	}
 
 	/**
@@ -103,6 +102,11 @@ public record MatrixLayout(int rows, int columns, int rowStride, int columnStrid
 	 * @return the index at which that element can be found
 	 */
 	public int index(int row, int column) {
+		assert row < rows;
+		assert column < columns;
+		assert row >= 0;
+		assert column >= 0;
+
 		return offset + row * rowStride + column * columnStride;
 	}
 
@@ -178,8 +182,23 @@ public record MatrixLayout(int rows, int columns, int rowStride, int columnStrid
 	 * @return is this layout optimal
 	 */
 	public boolean isOptimal() {
-		return isRowPacked()
-				&& rowStride >= VectorisationUtil.roundUpToVectorLength(columns)
-				&& length >= rowStride * (rows - 1) + VectorisationUtil.roundUpToVectorLength(columns);
+		return isRowPacked();
+	}
+
+	/**
+	 * Creates the layout of a sub-matrix
+	 * @param r the row of this layout to start the new layout at
+	 * @param c the column of this layout to start the new layout at
+	 * @param rows the number of rows in the sub-matrix
+	 * @param columns the number of columns in the sub-matrix
+	 * @return a sub-layout
+	 */
+	public MatrixLayout subLayout(int r, int c, int rows, int columns) {
+		assert rows >= 0 && r >= 0 && r + rows <= rows();
+		assert columns >= 0 && c >= 0 && c + columns <= columns();
+
+		int offset = index(r, c);
+
+		return new MatrixLayout(rows, columns, rowStride, columnStride, offset, length - offset);
 	}
 }

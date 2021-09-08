@@ -569,6 +569,14 @@ public interface MatrixView {
 	}
 
 	/**
+	 * Returns this matrix as a {@link Matrix} with the given layout, or a copy if it is not
+	 * @return A matrix object that may or may not be the same as this.
+	 */
+	default Matrix asMatrix(MatrixLayout layout) {
+		return copy(layout);
+	}
+
+	/**
 	 * Returns this matrix as a {@link SymmetricMatrixView} if it is one, or copies it into a symmetric form. This
 	 * method must only be called on matrices that are perfectly symmetric.
 	 * @return A symmetric matrix that may or may not be this matrix
@@ -592,15 +600,21 @@ public interface MatrixView {
 	/**
 	 * Copies this matrix, the new copy will be completely disjoint from this matrix, and is guaranteed to be in row-major
 	 * format with no offset.
-	 * @return A copy of this matrix
+	 * @return a copy of this matrix
 	 */
 	default Matrix copy() {
-		double[] matrix = new double[rows() * columns()];
-		for (int r = 0; r < rows(); r++) for (int c = 0; c < columns(); c++) {
-			matrix[r * columns() + c] = get(r, c);
-		}
+		return copy(MatrixLayout.rowMajor(rows(), columns()));
+	}
 
-		return Matrix.of(matrix, 0, columns(), 1, rows(), columns());
+	/**
+	 * Copies this matrix into the given layout
+	 * @param layout the layout of the new matrix
+	 * @return a copy of this matrix with the given layout
+	 */
+	default Matrix copy(MatrixLayout layout) {
+		var result = Matrix.zeros(layout);
+		result.set(this);
+		return result;
 	}
 
 	/**

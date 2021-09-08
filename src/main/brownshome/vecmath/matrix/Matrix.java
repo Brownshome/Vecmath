@@ -6,43 +6,14 @@ import java.util.Arrays;
  * An arbitrary size matrix of double precision
  */
 public final class Matrix implements MatrixView {
-	private final int rows, columns;
-
-	private final int offset, rowStride, columnStride;
+	private final MatrixLayout layout;
 	private final double[] m;
 
-	Matrix(double[] m, int rows, int columns, int offset, int rowStride, int columnStride) {
-		assert layoutIsValid(m, rows, columns, offset, rowStride, columnStride);
+	Matrix(double[] m, MatrixLayout layout) {
+		assert m.length >= layout.offset() + layout.length();
 
 		this.m = m;
-		this.rows = rows;
-		this.columns = columns;
-		this.offset = offset;
-		this.rowStride = rowStride;
-		this.columnStride = columnStride;
-	}
-
-	private static boolean layoutIsValid(double[] m, int rows, int columns, int offset, int rowStride, int columnStride) {
-		if (rows < 0 || columns < 0) {
-			return false;
-		}
-
-		if (rows == 0 || columns == 0) {
-			return true;
-		}
-
-		var predicate = new Object() {
-			boolean check(int row, int column) {
-				int index = offset + row * rowStride + column * columnStride;
-				return index >= 0 && index < m.length;
-			}
-		};
-
-		return m != null
-				&& predicate.check(0, 0)
-				&& predicate.check(rows - 1, 0)
-				&& predicate.check(0, columns - 1)
-				&& predicate.check(rows - 1, columns - 1);
+		this.layout = layout;
 	}
 
 	/**
@@ -69,15 +40,32 @@ public final class Matrix implements MatrixView {
 	 * @return a new matrix backed by the given array
 	 */
 	public static Matrix of(double[] matrix, int offset, int rowStride, int columnStride, int rows, int columns) {
-		return new Matrix(matrix, rows, columns, offset, rowStride, columnStride);
+		return new Matrix(matrix, new MatrixLayout(rows, columns, rowStride, columnStride, offset, matrix.length));
+	}
+
+	public static Matrix of(double[] matrix, MatrixLayout layout) {
+		return new Matrix(matrix, layout);
 	}
 
 	public static Matrix identity(int size) {
 		return MatrixView.identity(size).asMatrix();
 	}
 
+	/**
+	 * Creates an identity matrix with the given layout
+	 * @param layout the layout, this must be a square layout
+	 * @return an identity matrix
+	 */
+	public static Matrix identity(MatrixLayout layout) {
+		return MatrixView.identity(layout.rows()).asMatrix(layout);
+	}
+
 	public static Matrix zeros(int rows, int columns) {
 		return of(new double[rows * columns], rows, columns);
+	}
+
+	public static Matrix zeros(MatrixLayout layout) {
+		return of(new double[layout.offset() + layout.length()], layout);
 	}
 
 	public static Matrix constant(double value, int rows, int columns) {
@@ -86,8 +74,24 @@ public final class Matrix implements MatrixView {
 		return of(array, rows, columns);
 	}
 
+	public static Matrix constant(double value, MatrixLayout layout) {
+		double[] array = new double[layout.offset() + layout.length()];
+		Arrays.fill(array, layout.offset(), array.length, value);
+		return of(array, layout);
+	}
+
 	public static Matrix diagonal(double value, int size) {
 		return MatrixView.diagonal(value, size).asMatrix();
+	}
+
+	/**
+	 * Creates a diagonal matrix with the given layout
+	 * @param layout the layout, this must be a square layout
+	 * @param value the value on the diagonal
+	 * @return an diagonal matrix
+	 */
+	public static Matrix diagonal(double value, MatrixLayout layout) {
+		return MatrixView.diagonal(value, layout.rows()).asMatrix(layout);
 	}
 
 	/**
@@ -97,9 +101,7 @@ public final class Matrix implements MatrixView {
 	 * @return an index into the array
 	 */
 	public int index(int r, int c) {
-		assert r < rows && c < columns;
-
-		return offset + c * columnStride + r * rowStride;
+		return layout.index(r, c);
 	}
 
 	@Override
@@ -107,14 +109,18 @@ public final class Matrix implements MatrixView {
 		return m[index(row, column)];
 	}
 
+	public MatrixLayout layout() {
+		return layout;
+	}
+
 	@Override
 	public int rows() {
-		return rows;
+		return layout.rows();
 	}
 
 	@Override
 	public int columns() {
-		return columns;
+		return layout.columns();
 	}
 
 	/**
@@ -122,7 +128,7 @@ public final class Matrix implements MatrixView {
 	 * @return the index
 	 */
 	public int offset() {
-		return offset;
+		return layout.offset();
 	}
 
 	/**
@@ -130,7 +136,7 @@ public final class Matrix implements MatrixView {
 	 * @return index(1, 0) - index(0, 0)
 	 */
 	public int rowStride() {
-		return rowStride;
+		return layout.rowStride();
 	}
 
 	/**
@@ -138,7 +144,7 @@ public final class Matrix implements MatrixView {
 	 * @return index(0, 1) - index(0, 0)
 	 */
 	public int columnStride() {
-		return columnStride;
+		return layout.columnStride();
 	}
 
 	/**
@@ -150,18 +156,8 @@ public final class Matrix implements MatrixView {
 		return m;
 	}
 
-	private boolean layoutIsContinuous() {
-		return rowStride == columns && columnStride == 1
-				|| rowStride == 1 && columnStride == rows
-				|| rows == 0
-				|| columns == 0;
-	}
-
 	public Matrix subMatrix(int r, int c, int rows, int columns) {
-		assert rows >= 0 && r >= 0 && r + rows <= rows();
-		assert columns >= 0 && c >= 0 && c + columns <= columns();
-
-		return of(m, index(r, c), rowStride, columnStride, rows, columns);
+		return of(m, layout.subLayout(r, c, rows, columns));
 	}
 
 	/**
@@ -169,7 +165,7 @@ public final class Matrix implements MatrixView {
 	 * @param other the matrix to add
 	 */
 	public void add(MatrixView other) {
-		assert other.columns() == columns && other.rows() == rows;
+		assert other.columns() == columns() && other.rows() == rows();
 
 		if (other instanceof Matrix) {
 			add((Matrix) other);
@@ -183,9 +179,9 @@ public final class Matrix implements MatrixView {
 	 * @param other the matrix to add
 	 */
 	public void add(Matrix other) {
-		if (other.rowStride == rowStride && other.columnStride == columnStride && layoutIsContinuous()) {
-			for (int i = 0; i < rows * columns; i++) {
-				m[offset + i] += other.m[other.offset + i];
+		if (other.rowStride() == rowStride() && other.columnStride() == columnStride() && layout.isPacked()) {
+			for (int i = 0; i < rows() * columns(); i++) {
+				m[offset() + i] += other.m[other.offset() + i];
 			}
 		} else {
 			slowAddPath(other);
@@ -204,7 +200,7 @@ public final class Matrix implements MatrixView {
 	 * @param other the matrix to add
 	 */
 	public void scaleAdd(double scale, MatrixView other) {
-		assert other.columns() == columns && other.rows() == rows;
+		assert other.columns() == columns() && other.rows() == rows();
 
 		if (other instanceof Matrix) {
 			scaleAdd(scale, (Matrix) other);
@@ -219,9 +215,9 @@ public final class Matrix implements MatrixView {
 	 * @param other the matrix to add
 	 */
 	public void scaleAdd(double scale, Matrix other) {
-		if (other.rowStride == rowStride && other.columnStride == columnStride && layoutIsContinuous()) {
-			for (int i = 0; i < rows * columns; i++) {
-				m[offset + i] += scale * other.m[other.offset + i];
+		if (other.rowStride() == rowStride() && other.columnStride() == columnStride() && layout.isPacked()) {
+			for (int i = 0; i < rows() * columns(); i++) {
+				m[offset() + i] += scale * other.m[other.offset() + i];
 			}
 		} else {
 			slowScaleAddPath(scale, other);
@@ -239,12 +235,12 @@ public final class Matrix implements MatrixView {
 	 * @param scale the scale to use
 	 */
 	public void scale(double scale) {
-		if (layoutIsContinuous()) {
-			for (int i = 0; i < rows * columns; i++) {
-				m[offset + i] *= scale;
+		if (layout.isPacked()) {
+			for (int i = 0; i < rows() * columns(); i++) {
+				m[offset() + i] *= scale;
 			}
 		} else {
-			for (int r = 0; r < rows; r++) for (int c = 0; c < columns; c++) {
+			for (int r = 0; r < rows(); r++) for (int c = 0; c < columns(); c++) {
 				m[index(r, c)] *= scale;
 			}
 		}
@@ -255,7 +251,7 @@ public final class Matrix implements MatrixView {
 	 * @param scale the scale to use
 	 */
 	public void scale(MatrixView scale) {
-		assert scale.columns() == columns && scale.rows() == rows;
+		assert scale.columns() == columns() && scale.rows() == rows();
 
 		if (scale instanceof Matrix matrix) {
 			scale(matrix);
@@ -269,9 +265,9 @@ public final class Matrix implements MatrixView {
 	 * @param scale the scale to use
 	 */
 	public void scale(Matrix scale) {
-		if (scale.rowStride == rowStride && scale.columnStride == columnStride && layoutIsContinuous()) {
-			for (int i = 0; i < rows * columns; i++) {
-				m[offset + i] *= scale.m[scale.offset + i];
+		if (scale.rowStride() == rowStride() && scale.columnStride() == columnStride() && layout.isPacked()) {
+			for (int i = 0; i < rows() * columns(); i++) {
+				m[offset() + i] *= scale.m[scale.offset() + i];
 			}
 		} else {
 			slowScalePath(scale);
@@ -293,7 +289,7 @@ public final class Matrix implements MatrixView {
 	 * @param other the matrix to read
 	 */
 	public void set(MatrixView other) {
-		assert other.columns() == columns && other.rows() == rows;
+		assert other.columns() == columns() && other.rows() == rows();
 
 		if (other instanceof Matrix) {
 			set((Matrix) other);
@@ -307,8 +303,8 @@ public final class Matrix implements MatrixView {
 	 * @param other the matrix to read
 	 */
 	public void set(Matrix other) {
-		if (other.rowStride == rowStride && other.columnStride == columnStride && layoutIsContinuous()) {
-			System.arraycopy(other.m, other.offset, m, offset, rows * columns);
+		if (other.rowStride() == rowStride() && other.columnStride() == columnStride() && layout.isPacked()) {
+			System.arraycopy(other.m, other.offset(), m, offset(), rows() * columns());
 		} else {
 			slowPathSet(other);
 		}
@@ -322,7 +318,7 @@ public final class Matrix implements MatrixView {
 
 	@Override
 	public Matrix transpose() {
-		return of(m, offset, columnStride, rowStride, columns, rows);
+		return of(m, layout.transpose());
 	}
 
 	@Override
