@@ -67,7 +67,7 @@ final class CholeskyFactorisation implements Factorisation {
 			}
 
 			// Compute all L values in this column
-			for (int k = r + 1; k < s.rows(); k++) {
+			for (int k = r + 1; k < s.size(); k++) {
 				double l = m[s.index(k, r)];
 
 				for (int c = 0; c < r; c++) {

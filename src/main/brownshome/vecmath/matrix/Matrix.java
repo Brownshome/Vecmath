@@ -90,7 +90,13 @@ public final class Matrix implements MatrixView {
 		return MatrixView.diagonal(value, size).asMatrix();
 	}
 
-	private int index(int r, int c) {
+	/**
+	 * Returns the index in the backing array of the given row / column
+	 * @param r the row
+	 * @param c the column
+	 * @return an index into the array
+	 */
+	public int index(int r, int c) {
 		assert r < rows && c < columns;
 
 		return offset + c * columnStride + r * rowStride;

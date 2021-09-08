@@ -40,8 +40,13 @@ public class SymmetricMatrixBenchmark {
 	}
 
 	@Benchmark
-	public MatrixView solve(MatrixData data) {
+	public MatrixView solveLeft(MatrixData data) {
 		return data.factorisation.leftSolve(data.B);
+	}
+
+	@Benchmark
+	public MatrixView solveRight(MatrixData data) {
+		return data.factorisation.rightSolve(data.B);
 	}
 
 	@Benchmark

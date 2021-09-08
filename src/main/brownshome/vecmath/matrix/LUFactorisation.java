@@ -9,21 +9,20 @@ final class LUFactorisation implements Factorisation {
 	/**
 	 * Stores the decomposition of A as L + U - I
 	 */
-	private final MatrixView decomposition;
-	private final MatrixView permutation;
+	private final Matrix decomposition;
+	private final int[] permutation;
 	private final double determinant;
 
 	LUFactorisation(Matrix matrix, double tolerance) {
 		assert matrix.columns() == matrix.rows();
 
-		int[] permutation = new int[matrix.columns()];
+		permutation = new int[matrix.columns()];
 		for (int i = 0; i < matrix.rows(); i++) {
 			permutation[i] = i;
 		}
 
 		determinant = performFactorisation(matrix, permutation, tolerance);
-		this.permutation = new PermutationMatrix(permutation);
-		decomposition = this.permutation.multiply(matrix);
+		decomposition = matrix.permuteRows(permutation).copy();
 	}
 
 	private static double performFactorisation(Matrix decomposition, int[] permutations, double tolerance) {
@@ -88,75 +87,65 @@ final class LUFactorisation implements Factorisation {
 	public Matrix leftSolve(MatrixView other) {
 		assert size() == other.rows();
 
-		Matrix answer = permutation.multiply(other);
-
-		// Columns of B
-		for (int c = 0; c < answer.columns(); c++) {
+		Matrix m = other.permuteRows(permutation).copy();
+		double[] array = m.backingArray();
 
 			// Solve Ly = PB
 			for (int r = 0; r < size(); r++) {
-				double value = answer.get(r, c);
-
-				// Columns of L
 				for (int k = 0; k < r; k++) {
-					value -= decomposition.get(r, k) * answer.get(k, c);
+					for (int c = 0; c < m.columns(); c++) {
+						array[m.index(r, c)] -= decomposition.get(r, k) * m.get(k, c);
+					}
 				}
-
-				answer.set(value, r, c);
 			}
 
 			// Solve Ux = y
 			for (int r = size() - 1; r >= 0; r--) {
-				double value = answer.get(r, c);
-
-				// Column of U
 				for (int k = r + 1; k < size(); k++) {
-					value -= decomposition.get(r, k) * answer.get(k, c);
+					for (int c = 0; c < m.columns(); c++) {
+						array[m.index(r, c)] -= decomposition.get(r, k) * m.get(k, c);
+					}
 				}
 
-				answer.set(value / decomposition.get(r, r), r, c);
+				for (int c = 0; c < m.columns(); c++) {
+					array[m.index(r, c)] /= decomposition.get(r, r);
+				}
 			}
-		}
 
-		return answer;
+		return m;
 	}
 
 	@Override
 	public MatrixView rightSolve(MatrixView other) {
 		assert size() == other.columns();
 
-		Matrix answer = other.copy();
+		Matrix m = other.transpose().copy().transpose();
+		double[] array = m.backingArray();
 
-		// Rows of B
-		for (int r = 0; r < answer.rows(); r++) {
-
-			// Solve zU = B
-			for (int c = 0; c < size(); c++) {
-				double value = answer.get(r, c);
-
-				// Rows of U
-				for (int k = 0; k < c; k++) {
-					value -= decomposition.get(k, c) * answer.get(r, k);
+		// Solve zU = B
+		for (int c = 0; c < size(); c++) {
+			for (int k = 0; k < c; k++) {
+				for (int r = 0; r < m.rows(); r++) {
+					array[m.index(r, c)] -= decomposition.get(k, c) * m.get(r, k);
 				}
-
-				answer.set(value / decomposition.get(c, c), r, c);
 			}
 
-			// Solve yL = z
-			for (int c = size() - 1; c >= 0; c--) {
-				double value = answer.get(r, c);
+			for (int r = 0; r < m.rows(); r++) {
+				array[m.index(r, c)] /= decomposition.get(c, c);
+			}
+		}
 
-				// Row of L
-				for (int k = c + 1; k < size(); k++) {
-					value -= decomposition.get(k, c) * answer.get(r, k);
+		// Solve yL = z
+		for (int c = size() - 1; c >= 0; c--) {
+			for (int k = c + 1; k < size(); k++) {
+				for (int r = 0; r < m.rows(); r++) {
+					array[m.index(r, c)] -= decomposition.get(k, c) * m.get(r, k);
 				}
-
-				answer.set(value, r, c);
 			}
 		}
 
 		// Solve y / P = x
-		return answer.multiply(permutation);
+		return m.permuteColumns(permutation);
 	}
 
 	@Override
