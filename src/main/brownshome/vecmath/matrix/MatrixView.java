@@ -1,6 +1,7 @@
 package brownshome.vecmath.matrix;
 
 import brownshome.vecmath.*;
+import jdk.incubator.vector.DoubleVector;
 
 public interface MatrixView {
 	/**
@@ -547,6 +548,10 @@ public interface MatrixView {
 			return ((MatrixViewWithFastMultiply) other).leftMultiply(this);
 		}
 
+		if (other instanceof Matrix matrix && matrix.layout().isOptimal()) {
+			return multiply(matrix);
+		}
+
 		double[] n = new double[rows() * other.columns()];
 
 		for (int r = 0; r < rows(); r++) {
@@ -558,6 +563,30 @@ public interface MatrixView {
 		}
 
 		return Matrix.of(n, rows(), other.columns());
+	}
+
+	private Matrix multiply(Matrix other) {
+		var species = DoubleVector.SPECIES_PREFERRED;
+
+		var layout = MatrixLayout.optimal(rows(), other.columns());
+		double[] n = new double[layout.offset() + layout.length()];
+
+		for (int r = 0; r < rows(); r++) {
+			for (int c = 0; c < other.columns(); c += species.length()) {
+				var acc = DoubleVector.zero(species);
+
+				for (int k = 0; k < columns(); k++) {
+					var scale = DoubleVector.broadcast(species, get(r, k));
+					var row = DoubleVector.fromArray(species, other.backingArray(), other.index(k, c));
+
+					acc = row.fma(scale, acc);
+				}
+
+				acc.intoArray(n, layout.index(r, c));
+			}
+		}
+
+		return Matrix.of(n, layout);
 	}
 
 	/**

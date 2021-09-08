@@ -92,7 +92,8 @@ public record MatrixLayout(int rows, int columns, int rowStride, int columnStrid
 	 * @see MatrixLayout#isOptimal()
 	 */
 	public static MatrixLayout optimal(int rows, int columns) {
-		return rowMajor(rows, columns);
+		int rowStride = VectorisationUtil.roundUpToVectorLength(columns);
+		return new MatrixLayout(rows, columns, VectorisationUtil.roundUpToVectorLength(columns), 1, 0, rowStride * rows);
 	}
 
 	/**
@@ -182,7 +183,9 @@ public record MatrixLayout(int rows, int columns, int rowStride, int columnStrid
 	 * @return is this layout optimal
 	 */
 	public boolean isOptimal() {
-		return isRowPacked();
+		return isRowPacked()
+				&& rowStride >= VectorisationUtil.roundUpToVectorLength(columns)
+				&& length >= rowStride * (rows - 1) + VectorisationUtil.roundUpToVectorLength(columns);
 	}
 
 	/**

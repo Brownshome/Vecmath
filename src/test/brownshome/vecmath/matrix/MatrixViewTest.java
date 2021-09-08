@@ -1,6 +1,7 @@
 package brownshome.vecmath.matrix;
 
 import brownshome.vecmath.*;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
 import static brownshome.vecmath.CompareConstant.ACCURACY;
@@ -126,6 +127,19 @@ class MatrixViewTest {
 	@Test
 	void multiply() {
 		Matrix result = Matrix.of(new double[] { 1, 0, 0.5, 0.5 }, 2, 2).multiply(Matrix.of(new double[] { 2, 0, 0, 1 }, 2, 2));
+		Matrix expected = Matrix.of(new double[] { 2, 0, 1, 0.5 }, 2, 2);
+
+		assertEquals(expected.rows(), result.rows());
+		assertEquals(expected.columns(), result.columns());
+		assertArrayEquals(expected.backingArray(), result.backingArray(), ACCURACY);
+	}
+
+	@Test
+	void multiplyVector() {
+		Matrix result = Matrix.of(new double[] { 1, 0, 0.5, 0.5 }, 2, 2).asMatrix(MatrixLayout.optimal(2, 2))
+				.multiply(Matrix.of(new double[] { 2, 0, 0, 1 }, 2, 2).asMatrix(MatrixLayout.optimal(2, 2)))
+				.copy();
+
 		Matrix expected = Matrix.of(new double[] { 2, 0, 1, 0.5 }, 2, 2);
 
 		assertEquals(expected.rows(), result.rows());

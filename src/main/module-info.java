@@ -6,6 +6,8 @@
  *  - 3D Rotations given in axis-angle formulation are clockwise looking along the axis that are defined relative to
  */
 module brownshome.vecmath {
+	requires jdk.incubator.vector;
+
 	exports brownshome.vecmath;
 	exports brownshome.vecmath.matrix;
 }
