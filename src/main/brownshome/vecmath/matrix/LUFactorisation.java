@@ -1,5 +1,7 @@
 package brownshome.vecmath.matrix;
 
+import jdk.incubator.vector.DoubleVector;
+
 /**
  * An LU factorisation of a square matrix.
  *
@@ -87,30 +89,40 @@ final class LUFactorisation implements Factorisation {
 	public Matrix leftSolve(MatrixView other) {
 		assert size() == other.rows();
 
-		Matrix m = other.permuteRows(permutation).copy();
+		Matrix m = other.permuteRows(permutation).copy(MatrixLayout.optimal(other.rows(), other.columns()));
 		double[] array = m.backingArray();
 
-			// Solve Ly = PB
-			for (int r = 0; r < size(); r++) {
+		var species = DoubleVector.SPECIES_PREFERRED;
+
+		// Solve Ly = PB
+		for (int r = 0; r < size(); r++) {
+			for (int c = 0; c < m.columns(); c += species.length()) {
+				var acc = DoubleVector.fromArray(species, array, m.index(r, c));
+
 				for (int k = 0; k < r; k++) {
-					for (int c = 0; c < m.columns(); c++) {
-						array[m.index(r, c)] -= decomposition.get(r, k) * m.get(k, c);
-					}
+					var kRow = DoubleVector.fromArray(species, array, m.index(k, c));
+					var lValue = DoubleVector.broadcast(species, -decomposition.get(r, k));
+					acc = kRow.fma(lValue, acc);
 				}
-			}
 
-			// Solve Ux = y
-			for (int r = size() - 1; r >= 0; r--) {
+				acc.intoArray(array, m.index(r, c));
+			}
+		}
+
+		// Solve Ux = y
+		for (int r = size() - 1; r >= 0; r--) {
+			for (int c = 0; c < m.columns(); c += species.length()) {
+				var acc = DoubleVector.fromArray(species, array, m.index(r, c));
+
 				for (int k = r + 1; k < size(); k++) {
-					for (int c = 0; c < m.columns(); c++) {
-						array[m.index(r, c)] -= decomposition.get(r, k) * m.get(k, c);
-					}
+					var kRow = DoubleVector.fromArray(species, array, m.index(k, c));
+					var lValue = DoubleVector.broadcast(species, -decomposition.get(r, k));
+					acc = kRow.fma(lValue, acc);
 				}
 
-				for (int c = 0; c < m.columns(); c++) {
-					array[m.index(r, c)] /= decomposition.get(r, r);
-				}
+				acc.div(decomposition.get(r, r)).intoArray(array, m.index(r, c));
 			}
+		}
 
 		return m;
 	}
@@ -119,28 +131,38 @@ final class LUFactorisation implements Factorisation {
 	public MatrixView rightSolve(MatrixView other) {
 		assert size() == other.columns();
 
-		Matrix m = other.transpose().copy().transpose();
+		Matrix m = other.copy(MatrixLayout.optimal(other.columns(), other.rows()).transpose());
 		double[] array = m.backingArray();
+
+		var species = DoubleVector.SPECIES_PREFERRED;
 
 		// Solve zU = B
 		for (int c = 0; c < size(); c++) {
-			for (int k = 0; k < c; k++) {
-				for (int r = 0; r < m.rows(); r++) {
-					array[m.index(r, c)] -= decomposition.get(k, c) * m.get(r, k);
-				}
-			}
+			for (int r = 0; r < m.rows(); r += species.length()) {
+				var acc = DoubleVector.fromArray(species, array, m.index(r, c));
 
-			for (int r = 0; r < m.rows(); r++) {
-				array[m.index(r, c)] /= decomposition.get(c, c);
+				for (int k = 0; k < c; k++) {
+					var kRow = DoubleVector.fromArray(species, array, m.index(r, k));
+					var lValue = DoubleVector.broadcast(species, -decomposition.get(k, c));
+					acc = kRow.fma(lValue, acc);
+				}
+
+				acc.div(decomposition.get(c, c)).intoArray(array, m.index(r, c));
 			}
 		}
 
 		// Solve yL = z
 		for (int c = size() - 1; c >= 0; c--) {
-			for (int k = c + 1; k < size(); k++) {
-				for (int r = 0; r < m.rows(); r++) {
-					array[m.index(r, c)] -= decomposition.get(k, c) * m.get(r, k);
+			for (int r = 0; r < m.rows(); r += species.length()) {
+				var acc = DoubleVector.fromArray(species, array, m.index(r, c));
+
+				for (int k = c + 1; k < size(); k++) {
+					var kRow = DoubleVector.fromArray(species, array, m.index(r, k));
+					var lValue = DoubleVector.broadcast(species, -decomposition.get(k, c));
+					acc = kRow.fma(lValue, acc);
 				}
+
+				acc.intoArray(array, m.index(r, c));
 			}
 		}
 

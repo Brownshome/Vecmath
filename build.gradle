@@ -32,6 +32,12 @@ jmh {
 	iterations = 5
 	benchmarkMode = ['AverageTime']
 	timeUnit = 'us'
+
+	jvmArgsPrepend = ['--add-modules jdk.incubator.vector']
+}
+
+jmhRunBytecodeGenerator {
+	jvmArgs = ['--add-modules', 'jdk.incubator.vector']
 }
 
 publishing {
@@ -79,4 +85,8 @@ dependencies {
 
 test {
 	useJUnitPlatform()
+	jvmArgs += [
+			'--add-modules',
+			'jdk.incubator.vector'
+	]
 }
