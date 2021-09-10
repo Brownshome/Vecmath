@@ -11,7 +11,7 @@ public interface SymmetricMatrixView extends MatrixView {
 	 * @return a newly constructed symmetric matrix backed by the given array
 	 */
 	static SymmetricMatrixView of(double[] array, int size) {
-		return SymmetricMatrix.of(array, size);
+		return Matrix.of(array, size, size).asSymmetricMatrix();
 	}
 
 	@Override
@@ -21,7 +21,7 @@ public interface SymmetricMatrixView extends MatrixView {
 
 	@Override
 	default Factorisation factorise() {
-		return new CholeskyFactorisation(SymmetricMatrix.of(this), 1e-10);
+		return new CholeskyFactorisation(this, 1e-10);
 	}
 
 	/**

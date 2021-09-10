@@ -1,21 +1,19 @@
 package brownshome.vecmath.matrix;
 
-import java.util.Arrays;
+final class SymmetricMatrix implements SymmetricMatrixView, MatrixViewWithFastMultiply {
+	private final MatrixView delegate;
 
-final class SymmetricMatrix implements SymmetricMatrixView {
-	private final int size;
+	private SymmetricMatrix(MatrixView delegate) {
+		assert isSymmetric(delegate);
 
-	// Stored in row-major format, ignoring elements above the main diagonal
-	private final double[] matrix;
-
-	private SymmetricMatrix(double[] m, int size) {
-		assert m.length == size * size;
-
-		this.matrix = m;
-		this.size = size;
+		this.delegate = delegate;
 	}
 
 	private static boolean isSymmetric(MatrixView m) {
+		if (m.rows() != m.columns()) {
+			return false;
+		}
+
 		for (int r = 0; r < m.rows(); r++) {
 			for (int c = 0; c < r; c++) {
 				if (m.get(r, c) != m.get(c, r)) {
@@ -27,88 +25,40 @@ final class SymmetricMatrix implements SymmetricMatrixView {
 		return true;
 	}
 
-	private static int backingArrayLength(int size) {
-		return size * size;
-	}
-
-	int index(int r, int c) {
-		assert c <= r;
-
-		return r * size + c;
-	}
-
-	static SymmetricMatrix of(MatrixView m) {
-		assert m.rows() == m.columns() && isSymmetric(m);
-
-		double[] array = new double[backingArrayLength(m.rows())];
-
-		var result = new SymmetricMatrix(array, m.rows());
-
-		for (int r = 0; r < m.rows(); r++) {
-			for (int c = 0; c <= r; c++) {
-				array[result.index(r, c)] = m.get(r, c);
-			}
-		}
-
-		return new SymmetricMatrix(array, m.rows());
-	}
-
-	static SymmetricMatrix of(Matrix m) {
-		assert m.rows() == m.columns() && isSymmetric(m);
-
-		int stride;
-
-		if (m.columnStride() == 1) {
-			stride = m.rowStride();
-		} else if (m.rowStride() == 1) {
-			stride = m.columnStride();
-		} else {
-			return of((MatrixView) m);
-		}
-
-		double[] array;
-		if (stride == m.rows()) {
-			array = Arrays.copyOfRange(m.backingArray(), m.offset(), m.offset() + backingArrayLength(m.rows()));
-		} else {
-			array = new double[backingArrayLength(m.rows())];
-
-			for (int r = 0; r < m.rows(); r++) {
-				System.arraycopy(m.backingArray(), m.offset() + stride * r, array, r * m.rows(), r + 1);
-			}
-		}
-
-		return new SymmetricMatrix(array, m.rows());
-	}
-
-	static SymmetricMatrix of(double[] matrix, int rows) {
-		return new SymmetricMatrix(matrix, rows);
+	static SymmetricMatrix of(MatrixView other) {
+		return new SymmetricMatrix(other);
 	}
 
 	@Override
 	public int size() {
-		return size;
+		return delegate.rows();
 	}
 
 	@Override
 	public double get(int row, int column) {
-		assert row < size && column < size;
+		return column <= row
+				? delegate.get(row, column)
+				: delegate.get(column, row);
+	}
 
-		return matrix[column <= row
-				? index(row, column)
-				: index(column, row)];
+	@Override
+	public Matrix multiply(MatrixView other) {
+		return delegate.multiply(other);
+	}
+
+	@Override
+	public Matrix asMatrix(MatrixLayout layout) {
+		return delegate.asMatrix(layout);
+	}
+
+	@Override
+	public Matrix asMatrix() {
+		return delegate.asMatrix();
 	}
 
 	@Override
 	public Matrix copy() {
-		double[] array = matrix.clone();
-
-		for (int r = 0; r < size; r++) {
-			for (int c = r + 1; c < size; c++) {
-				array[r * size + c] = matrix[index(c, r)];
-			}
-		}
-
-		return Matrix.of(array, size, size);
+		return delegate.copy();
 	}
 
 	@Override
@@ -116,8 +66,14 @@ final class SymmetricMatrix implements SymmetricMatrixView {
 		return this;
 	}
 
-	double[] backingArray() {
-		return matrix;
+	@Override
+	public MatrixView permuteRows(int... rows) {
+		return delegate.permuteRows(rows);
+	}
+
+	@Override
+	public MatrixView permuteColumns(int... columns) {
+		return delegate.permuteColumns(columns);
 	}
 
 	@Override
@@ -125,8 +81,9 @@ final class SymmetricMatrix implements SymmetricMatrixView {
 		return MatrixView.toString(this);
 	}
 
+
 	@Override
-	public Factorisation factorise() {
-		return new CholeskyFactorisation(new SymmetricMatrix(matrix, size), 1e-10);
+	public Matrix leftMultiply(MatrixView other) {
+		return other.multiply(delegate);
 	}
 }

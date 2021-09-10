@@ -7,20 +7,25 @@ package brownshome.vecmath.matrix;
  */
 final class CholeskyFactorisation implements Factorisation {
 	/**
-	 * Stores the decomposition of A as L + L' + D - 2I
+	 * Don't bother pivoting if the leading value is larger than this
 	 */
-	private final SymmetricMatrix decomposition;
+	private static final double PIVOT_THRESHOLD = 1e-6;
+
+	/**
+	 * Stores the decomposition of A as L
+	 */
+	private final Matrix decomposition;
 	private final MatrixView permutation;
 	private final double determinant;
 
-	CholeskyFactorisation(SymmetricMatrix matrix, double tolerance) {
+	CholeskyFactorisation(SymmetricMatrixView matrix, double tolerance) {
 		int[] permutation = new int[matrix.rows()];
 		for (int i = 0; i < matrix.rows(); i++) {
 			permutation[i] = i;
 		}
 
-		determinant = performFactorisation(matrix, permutation, tolerance);
-		decomposition = matrix;
+		decomposition = matrix.copy();
+		determinant = performFactorisation(decomposition, permutation, tolerance);
 		this.permutation = new PermutationMatrix(permutation);
 	}
 
@@ -29,59 +34,58 @@ final class CholeskyFactorisation implements Factorisation {
 	 *
 	 * https://en.wikipedia.org/wiki/Cholesky_decomposition#LDL_decomposition_2
 	 *
-	 * @param s the matrix to factorise
-	 * @param permutation a permutation that is used to pivot the rows and columns of s.
+	 * @param m the matrix to factorise
+	 * @param permutation a permutation that is used to pivot the rows and columns of m.
 	 * @param tolerance a value to detect singular matrices
 	 * @return the determinant of the matrix
 	 */
-	private static double performFactorisation(SymmetricMatrix s, int[] permutation, double tolerance) {
+	private static double performFactorisation(Matrix m, int[] permutation, double tolerance) {
+		int size = permutation.length;
 		double determinant = 1.0;
-		double[] m = s.backingArray();
+		double[] array = m.backingArray();
 
-		for (int r = 0; r < s.size(); r++) {
+		for (int rc = 0; rc < size - 1; rc++) {
 			// Find the largest diagonal element remaining to pivot
-			int maxIndex = r;
-			double max = Math.abs(m[s.index(r, r)]);
-			for (int i = r + 1; i < s.size(); i++) {
-				double x = Math.abs(m[s.index(i, i)]);
-				if (x > max) {
-					max = x;
-					maxIndex = i;
+			int maxIndex = rc;
+			double diag = array[m.index(rc, rc)];
+			for (int rrcc = rc + 1; Math.abs(diag) <= Math.max(tolerance, PIVOT_THRESHOLD) && rrcc < size; rrcc++) {
+				double value = array[m.index(rrcc, rrcc)];
+
+				if (Math.abs(value) > Math.abs(diag)) {
+					diag = value;
+					maxIndex = rrcc;
 				}
 			}
 
-			// Pivot
-			pivot(s, r, maxIndex);
+			if (rc != maxIndex) {
+				int swap = permutation[rc];
+				permutation[rc] = permutation[maxIndex];
+				permutation[maxIndex] = swap;
 
-			double diag = m[s.index(r, r)];
-
-			if (Math.abs(diag) < tolerance) {
-				throw new SingularMatrixException();
+				// Pivot
+				pivot(m, rc, maxIndex);
 			}
 
 			determinant *= diag;
-			{
-				int swap = permutation[r];
-				permutation[r] = permutation[maxIndex];
-				permutation[maxIndex] = swap;
-			}
 
 			// Compute all L values in this column
-			for (int k = r + 1; k < s.size(); k++) {
-				double l = m[s.index(k, r)];
+			for (int r = rc + 1; r < size; r++) {
+				double l = array[m.index(r, rc)];
 
-				for (int c = 0; c < r; c++) {
-					l -= m[s.index(r, c)] * m[s.index(k, c)] * m[s.index(c, c)];
+				for (int c = 0; c < rc; c++) {
+					l -= array[m.index(rc, c)] * array[m.index(r, c)] * array[m.index(c, c)];
 				}
 
-				m[s.index(k, r)] = l / diag;
+				// Adjust other diagonal values using the new diagonal value
+				array[m.index(r, r)] -= l * (l /= diag);
+				array[m.index(r, rc)] = l;
 			}
+		}
 
-			// Adjust other diagonal values using the new diagonal value
-			for (int i = r + 1; i < s.rows(); i++) {
-				double lVal = m[s.index(i, r)];
-				m[s.index(i, i)] -= diag * lVal * lVal;
-			}
+		determinant *= array[m.index(size - 1, size - 1)];
+
+		if (Math.abs(determinant) <= tolerance) {
+			throw new SingularMatrixException();
 		}
 
 		return determinant;
@@ -90,41 +94,37 @@ final class CholeskyFactorisation implements Factorisation {
 	/**
 	 * Pivot a and b, a <= b
 	 */
-	private static void pivot(SymmetricMatrix s, int a, int b) {
-		assert a <= b;
+	private static void pivot(Matrix m, int a, int b) {
+		assert a < b;
 
-		double[] m = s.backingArray();
-
-		if (a == b) {
-			return;
-		}
+		double[] array = m.backingArray();
 
 		// (a, a) <-> (b, b)
 		{
-			double tmp = m[s.index(a, a)];
-			m[s.index(a, a)] = m[s.index(b, b)];
-			m[s.index(b, b)] = tmp;
+			double tmp = array[m.index(a, a)];
+			array[m.index(a, a)] = array[m.index(b, b)];
+			array[m.index(b, b)] = tmp;
 		}
 
 		// (a, i) <-> (b, i) [i < a]
 		for (int i = 0; i < a; i++) {
-			double tmp = m[s.index(a, i)];
-			m[s.index(a, i)] = m[s.index(b, i)];
-			m[s.index(b, i)] = tmp;
+			double tmp = array[m.index(a, i)];
+			array[m.index(a, i)] = array[m.index(b, i)];
+			array[m.index(b, i)] = tmp;
 		}
 
 		// (i, a) <-> (b, i) [a < i < b]
 		for (int i = a + 1; i < b; i++) {
-			double tmp = m[s.index(i, a)];
-			m[s.index(i, a)] = m[s.index(b, i)];
-			m[s.index(b, i)] = tmp;
+			double tmp = array[m.index(i, a)];
+			array[m.index(i, a)] = array[m.index(b, i)];
+			array[m.index(b, i)] = tmp;
 		}
 
 		// (i, b) <-> (i, a) [b < i]
-		for (int i = b + 1; i < s.rows(); i++) {
-			double tmp = m[s.index(i, a)];
-			m[s.index(i, a)] = m[s.index(i, b)];
-			m[s.index(i, b)] = tmp;
+		for (int i = b + 1; i < m.rows(); i++) {
+			double tmp = array[m.index(i, a)];
+			array[m.index(i, a)] = array[m.index(i, b)];
+			array[m.index(i, b)] = tmp;
 		}
 	}
 
