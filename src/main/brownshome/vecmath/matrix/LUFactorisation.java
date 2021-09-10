@@ -15,31 +15,40 @@ final class LUFactorisation implements Factorisation {
 	private final int[] permutation;
 	private final double determinant;
 
-	LUFactorisation(Matrix matrix, double tolerance) {
+	LUFactorisation(MatrixView matrix, double tolerance) {
 		assert matrix.columns() == matrix.rows();
+
+		// Wider stride
+		int stride = matrix.columns() + DoubleVector.SPECIES_PREFERRED.length();
+
+		// Special layout to allow vectorisation
+		decomposition = matrix.copy(new MatrixLayout(
+				matrix.rows(), matrix.columns(),
+				stride, 1,
+				0, stride * matrix.rows()
+		));
 
 		permutation = new int[matrix.columns()];
 		for (int i = 0; i < matrix.rows(); i++) {
 			permutation[i] = i;
 		}
 
-		determinant = performFactorisation(matrix, permutation, tolerance);
-		decomposition = matrix.permuteRows(permutation).copy();
+		determinant = performFactorisation(decomposition, permutation, tolerance);
 	}
 
-	private static double performFactorisation(Matrix decomposition, int[] permutations, double tolerance) {
+	private static double performFactorisation(Matrix m, int[] permutations, double tolerance) {
+		var species = DoubleVector.SPECIES_PREFERRED;
 		int size = permutations.length;
 		double determinant = 1.0;
+		double[] array = m.backingArray();
 
 		// Eliminate the values below the diagonal
-		for (int c = 0; c < size; c++) {
-			int columnIndex = permutations[c];
-
+		for (int rc = 0; rc < size; rc++) {
 			// Find the max element
-			double max = decomposition.get(columnIndex, c);
-			int maxRow = c;
-			for (int r = c + 1; r < size; r++) {
-				double value = decomposition.get(permutations[r], c);
+			double max = array[m.index(rc, rc)];
+			int maxRow = rc;
+			for (int r = rc + 1; r < size; r++) {
+				double value = array[m.index(r, rc)];
 
 				if (Math.abs(value) > Math.abs(max)) {
 					max = value;
@@ -54,25 +63,31 @@ final class LUFactorisation implements Factorisation {
 			determinant *= max;
 
 			// Pivot the rows
-			if (maxRow != c) {
-				permutations[c] = permutations[maxRow];
-				permutations[maxRow] = columnIndex;
-				determinant = -determinant;
+			if (maxRow != rc) {
+				int tmp = permutations[rc];
+				permutations[rc] = permutations[maxRow];
+				permutations[maxRow] = tmp;
 
-				columnIndex = permutations[c];
+				for (int c = 0; c < size; c += species.length()) {
+					var tmpVec = DoubleVector.fromArray(species, array, m.index(rc, 0));
+					DoubleVector.fromArray(species, array, m.index(maxRow, 0)).intoArray(array, m.index(rc, 0));
+					tmpVec.intoArray(array, m.index(maxRow, 0));
+				}
+
+				determinant = -determinant;
 			}
 
 			// Subtract the greatest row for each row under it
-			for (int r = c + 1; r < size; r++) {
-				int rowIndex = permutations[r];
+			for (int r = rc + 1; r < size; r++) {
+				array[m.index(r, rc)] /= max;
+				var leadingEntry = DoubleVector.broadcast(species, -array[m.index(r, rc)]);
 
-				double valueAtColumn = decomposition.get(rowIndex, c) / max;
-				decomposition.set(valueAtColumn, rowIndex, c);
+				for (int c = rc + 1; c < size; c += species.length()) {
+					var acc = DoubleVector.fromArray(species, array, m.index(r, c));
+					var maxRowVec = DoubleVector.fromArray(species, array, m.index(rc, c));
+					acc = maxRowVec.fma(leadingEntry, acc);
 
-				for (int k = c + 1; k < size; k++) {
-					double value = decomposition.get(rowIndex, k);
-					double maxRowValue = decomposition.get(columnIndex, k);
-					decomposition.set(value - valueAtColumn * maxRowValue, rowIndex, k);
+					acc.intoArray(array, m.index(r, c));
 				}
 			}
 		}
