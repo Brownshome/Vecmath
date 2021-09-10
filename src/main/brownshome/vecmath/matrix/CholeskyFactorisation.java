@@ -1,5 +1,7 @@
 package brownshome.vecmath.matrix;
 
+import jdk.incubator.vector.DoubleVector;
+
 /**
  * An Cholesky factorisation of a square symmetric matrix.
  *
@@ -15,17 +17,39 @@ final class CholeskyFactorisation implements Factorisation {
 	 * Stores the decomposition of A as L
 	 */
 	private final Matrix decomposition;
+
+	// Negative diagonal elements
+	private final double[] diagonal;
 	private final MatrixView permutation;
 	private final double determinant;
 
 	CholeskyFactorisation(SymmetricMatrixView matrix, double tolerance) {
-		int[] permutation = new int[matrix.rows()];
+		// Wider stride
+		int stride = matrix.rows() + DoubleVector.SPECIES_PREFERRED.length() - 1;
+
+		// Special layout to allow vectorisation, in column major order
+		decomposition = Matrix.zeros(new MatrixLayout(
+				matrix.rows(), matrix.columns(),
+				1, stride,
+				0, stride * matrix.columns()
+		));
+		diagonal = new double[matrix.size() + DoubleVector.SPECIES_PREFERRED.length() - 1];
+
+		var array = decomposition.backingArray();
+		for (int c = 0; c < matrix.size(); c++) {
+			diagonal[c] = -matrix.get(c, c);
+
+			for (int r = c + 1; r < matrix.size(); r++) {
+				array[r + stride * c] = matrix.get(r, c);
+			}
+		}
+
+		int[] permutation = new int[matrix.columns()];
 		for (int i = 0; i < matrix.rows(); i++) {
 			permutation[i] = i;
 		}
 
-		decomposition = matrix.copy();
-		determinant = performFactorisation(decomposition, permutation, tolerance);
+		determinant = performFactorisation(decomposition, diagonal, permutation, tolerance);
 		this.permutation = new PermutationMatrix(permutation);
 	}
 
@@ -35,11 +59,13 @@ final class CholeskyFactorisation implements Factorisation {
 	 * https://en.wikipedia.org/wiki/Cholesky_decomposition#LDL_decomposition_2
 	 *
 	 * @param m the matrix to factorise
+	 * @param diagonal the diagonal entries
 	 * @param permutation a permutation that is used to pivot the rows and columns of m.
 	 * @param tolerance a value to detect singular matrices
 	 * @return the determinant of the matrix
 	 */
-	private static double performFactorisation(Matrix m, int[] permutation, double tolerance) {
+	private static double performFactorisation(Matrix m, double[] diagonal, int[] permutation, double tolerance) {
+		var species = DoubleVector.SPECIES_PREFERRED;
 		int size = permutation.length;
 		double determinant = 1.0;
 		double[] array = m.backingArray();
@@ -47,9 +73,9 @@ final class CholeskyFactorisation implements Factorisation {
 		for (int rc = 0; rc < size - 1; rc++) {
 			// Find the largest diagonal element remaining to pivot
 			int maxIndex = rc;
-			double diag = array[m.index(rc, rc)];
+			double diag = -diagonal[rc];
 			for (int rrcc = rc + 1; Math.abs(diag) <= Math.max(tolerance, PIVOT_THRESHOLD) && rrcc < size; rrcc++) {
-				double value = array[m.index(rrcc, rrcc)];
+				double value = -diagonal[rrcc];
 
 				if (Math.abs(value) > Math.abs(diag)) {
 					diag = value;
@@ -62,27 +88,37 @@ final class CholeskyFactorisation implements Factorisation {
 				permutation[rc] = permutation[maxIndex];
 				permutation[maxIndex] = swap;
 
+				diagonal[maxIndex] = diagonal[rc];
+				diagonal[rc] = -diag;
+
 				// Pivot
 				pivot(m, rc, maxIndex);
 			}
 
 			determinant *= diag;
 
-			// Compute all L values in this column
-			for (int r = rc + 1; r < size; r++) {
-				double l = array[m.index(r, rc)];
+			for (int r = rc + 1; r < size; r += species.length()) {
+				var raw = DoubleVector.fromArray(species, array, m.index(r, rc));
+				var l = raw.div(diag);
+				l.intoArray(array, m.index(r, rc));
 
-				for (int c = 0; c < rc; c++) {
-					l -= array[m.index(rc, c)] * array[m.index(r, c)] * array[m.index(c, c)];
+				var diagonalVec = DoubleVector.fromArray(species, diagonal, r);
+				raw.fma(l, diagonalVec).intoArray(diagonal, r);
+			}
+
+			for (int c = rc + 1; c < size - 1; c++) {
+				var lCol = DoubleVector.broadcast(species, -diag * array[m.index(c, rc)]);
+
+				for (int r = c + 1; r < size; r += species.length()) {
+					// Lrc -= Lr rc * Lc rc * Drc
+					var lRow = DoubleVector.fromArray(species, array, m.index(r, rc));
+					var l = DoubleVector.fromArray(species, array, m.index(r, c));
+					lRow.fma(lCol, l).intoArray(array, m.index(r, c));
 				}
-
-				// Adjust other diagonal values using the new diagonal value
-				array[m.index(r, r)] -= l * (l /= diag);
-				array[m.index(r, rc)] = l;
 			}
 		}
 
-		determinant *= array[m.index(size - 1, size - 1)];
+		determinant *= -diagonal[m.rows() - 1];
 
 		if (Math.abs(determinant) <= tolerance) {
 			throw new SingularMatrixException();
@@ -98,13 +134,6 @@ final class CholeskyFactorisation implements Factorisation {
 		assert a < b;
 
 		double[] array = m.backingArray();
-
-		// (a, a) <-> (b, b)
-		{
-			double tmp = array[m.index(a, a)];
-			array[m.index(a, a)] = array[m.index(b, b)];
-			array[m.index(b, b)] = tmp;
-		}
 
 		// (a, i) <-> (b, i) [i < a]
 		for (int i = 0; i < a; i++) {
@@ -158,7 +187,7 @@ final class CholeskyFactorisation implements Factorisation {
 
 			// Solve L'x = D⁻¹y
 			for (int r = size() - 1; r >= 0; r--) {
-				double value = answer.get(r, c) / m[s.index(r, r)];
+				double value = answer.get(r, c) / -diagonal[r];
 
 				// Column of L'
 				for (int k = r + 1; k < size(); k++) {
@@ -197,7 +226,7 @@ final class CholeskyFactorisation implements Factorisation {
 
 			// Solve xL = yD⁻¹
 			for (int c = size() - 1; c >= 0; c--) {
-				double value = answer.get(r, c) / m[s.index(c, c)];
+				double value = answer.get(r, c) / -diagonal[c];
 
 				// Row of L
 				for (int k = c + 1; k < size(); k++) {
