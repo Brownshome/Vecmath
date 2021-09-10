@@ -20,7 +20,7 @@ final class CholeskyFactorisation implements Factorisation {
 
 	// Negative diagonal elements
 	private final double[] diagonal;
-	private final MatrixView permutation;
+	private final int[] permutation;
 	private final double determinant;
 
 	CholeskyFactorisation(SymmetricMatrixView matrix, double tolerance) {
@@ -44,13 +44,12 @@ final class CholeskyFactorisation implements Factorisation {
 			}
 		}
 
-		int[] permutation = new int[matrix.columns()];
+		permutation = new int[matrix.columns()];
 		for (int i = 0; i < matrix.rows(); i++) {
 			permutation[i] = i;
 		}
 
 		determinant = performFactorisation(decomposition, diagonal, permutation, tolerance);
-		this.permutation = new PermutationMatrix(permutation);
 	}
 
 	/**
@@ -166,78 +165,84 @@ final class CholeskyFactorisation implements Factorisation {
 	public MatrixView leftSolve(MatrixView other) {
 		assert size() == other.rows();
 
-		var s = decomposition;
-		double[] m = s.backingArray();
-		var answer = permutation.multiply(other).asMatrix();
+		Matrix m = other.permuteRows(permutation).copy(MatrixLayout.optimal(other.rows(), other.columns()));
+		double[] array = m.backingArray();
 
-		// Columns of PB
-		for (int c = 0; c < answer.columns(); c++) {
+		var species = DoubleVector.SPECIES_PREFERRED;
 
-			// Solve Ly = PB
-			for (int r = 0; r < size(); r++) {
-				double value = answer.get(r, c);
+		// Solve Ly = PB
+		for (int r = 1; r < size(); r++) {
+			for (int c = 0; c < m.columns(); c += species.length()) {
+				var acc = DoubleVector.fromArray(species, array, m.index(r, c));
 
-				// Columns of L
 				for (int k = 0; k < r; k++) {
-					value -= m[s.index(r, k)] * answer.get(k, c);
+					var kRow = DoubleVector.fromArray(species, array, m.index(k, c));
+					var lValue = DoubleVector.broadcast(species, -decomposition.get(r, k));
+					acc = kRow.fma(lValue, acc);
 				}
 
-				answer.set(value, r, c);
-			}
-
-			// Solve L'x = D⁻¹y
-			for (int r = size() - 1; r >= 0; r--) {
-				double value = answer.get(r, c) / -diagonal[r];
-
-				// Column of L'
-				for (int k = r + 1; k < size(); k++) {
-					value -= m[s.index(k, r)] * answer.get(k, c);
-				}
-
-				answer.set(value, r, c);
+				acc.intoArray(array, m.index(r, c));
 			}
 		}
 
-		return permutation.transpose().multiply(answer);
+		// Solve L'x = D⁻¹y
+		for (int r = size() - 1; r >= 0; r--) {
+			for (int c = 0; c < m.columns(); c += species.length()) {
+				var acc = DoubleVector.fromArray(species, array, m.index(r, c)).div(-diagonal[r]);
+
+				for (int k = r + 1; k < size(); k++) {
+					var kRow = DoubleVector.fromArray(species, array, m.index(k, c));
+					var lValue = DoubleVector.broadcast(species, -decomposition.get(k, r));
+					acc = kRow.fma(lValue, acc);
+				}
+
+				acc.intoArray(array, m.index(r, c));
+			}
+		}
+
+		return m.permuteRows(PermutationUtil.invertPermutation(permutation));
 	}
 
 	@Override
 	public MatrixView rightSolve(MatrixView other) {
 		assert size() == other.columns();
 
-		var s = decomposition;
-		double[] m = s.backingArray();
-		var answer = other.multiply(permutation.transpose()).asMatrix();
+		Matrix m = other.permuteColumns(PermutationUtil.invertPermutation(permutation)).copy(MatrixLayout.optimal(other.columns(), other.rows()).transpose());
+		double[] array = m.backingArray();
 
-		// Rows of BP'
-		for (int r = 0; r < answer.rows(); r++) {
+		var species = DoubleVector.SPECIES_PREFERRED;
 
-			// Solve yL' = BP'
-			for (int c = 0; c < size(); c++) {
-				double value = answer.get(r, c);
+		// Solve yL' = BP'
+		for (int c = 1; c < size(); c++) {
+			for (int r = 0; r < m.rows(); r += species.length()) {
+				var acc = DoubleVector.fromArray(species, array, m.index(r, c));
 
-				// Rows of L
 				for (int k = 0; k < c; k++) {
-					value -= m[s.index(c, k)] * answer.get(r, k);
+					var kRow = DoubleVector.fromArray(species, array, m.index(r, k));
+					var lValue = DoubleVector.broadcast(species, -decomposition.get(c, k));
+					acc = kRow.fma(lValue, acc);
 				}
 
-				answer.set(value, r, c);
-			}
-
-			// Solve xL = yD⁻¹
-			for (int c = size() - 1; c >= 0; c--) {
-				double value = answer.get(r, c) / -diagonal[c];
-
-				// Row of L
-				for (int k = c + 1; k < size(); k++) {
-					value -= m[s.index(k, c)] * answer.get(r, k);
-				}
-
-				answer.set(value, r, c);
+				acc.intoArray(array, m.index(r, c));
 			}
 		}
 
-		return answer.multiply(permutation);
+		// Solve xL = yD⁻¹
+		for (int c = size() - 1; c >= 0; c--) {
+			for (int r = 0; r < m.rows(); r += species.length()) {
+				var acc = DoubleVector.fromArray(species, array, m.index(r, c)).div(-diagonal[c]);
+
+				for (int k = c + 1; k < size(); k++) {
+					var kRow = DoubleVector.fromArray(species, array, m.index(r, k));
+					var lValue = DoubleVector.broadcast(species, -decomposition.get(k, c));
+					acc = kRow.fma(lValue, acc);
+				}
+
+				acc.intoArray(array, m.index(r, c));
+			}
+		}
+
+		return m.permuteColumns(permutation);
 	}
 
 	@Override
