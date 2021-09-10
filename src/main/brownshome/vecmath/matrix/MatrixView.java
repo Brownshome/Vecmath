@@ -664,7 +664,7 @@ public interface MatrixView {
 	}
 
 	default Factorisation factorise() {
-		return new LUFactorisation(copy(), 1e-10);
+		return new LUFactorisation(this, 1e-10);
 	}
 
 	default MatrixView invert() {

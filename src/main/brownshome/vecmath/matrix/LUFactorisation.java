@@ -9,6 +9,11 @@ import jdk.incubator.vector.DoubleVector;
  */
 final class LUFactorisation implements Factorisation {
 	/**
+	 * Don't bother pivoting if the leading value is larger than this
+	 */
+	private static final double PIVOT_THRESHOLD = 1e-6;
+
+	/**
 	 * Stores the decomposition of A as L + U - I
 	 */
 	private final Matrix decomposition;
@@ -36,9 +41,9 @@ final class LUFactorisation implements Factorisation {
 		determinant = performFactorisation(decomposition, permutation, tolerance);
 	}
 
-	private static double performFactorisation(Matrix m, int[] permutations, double tolerance) {
+	private static double performFactorisation(Matrix m, int[] permutation, double tolerance) {
 		var species = DoubleVector.SPECIES_PREFERRED;
-		int size = permutations.length;
+		int size = permutation.length;
 		double determinant = 1.0;
 		double[] array = m.backingArray();
 
@@ -47,7 +52,7 @@ final class LUFactorisation implements Factorisation {
 			// Find the max element
 			double max = array[m.index(rc, rc)];
 			int maxRow = rc;
-			for (int r = rc + 1; r < size; r++) {
+			for (int r = rc + 1; Math.abs(max) <= Math.max(tolerance, PIVOT_THRESHOLD) && r < size; r++) {
 				double value = array[m.index(r, rc)];
 
 				if (Math.abs(value) > Math.abs(max)) {
@@ -64,14 +69,14 @@ final class LUFactorisation implements Factorisation {
 
 			// Pivot the rows
 			if (maxRow != rc) {
-				int tmp = permutations[rc];
-				permutations[rc] = permutations[maxRow];
-				permutations[maxRow] = tmp;
+				int tmp = permutation[rc];
+				permutation[rc] = permutation[maxRow];
+				permutation[maxRow] = tmp;
 
-				for (int c = 0; c < size; c += species.length()) {
-					var tmpVec = DoubleVector.fromArray(species, array, m.index(rc, 0));
-					DoubleVector.fromArray(species, array, m.index(maxRow, 0)).intoArray(array, m.index(rc, 0));
-					tmpVec.intoArray(array, m.index(maxRow, 0));
+				for (int c = 0; c < size; c++) {
+					var t = array[m.index(rc, c)];
+					array[m.index(rc, c)] = array[m.index(maxRow, c)];
+					array[m.index(maxRow, c)] = t;
 				}
 
 				determinant = -determinant;
