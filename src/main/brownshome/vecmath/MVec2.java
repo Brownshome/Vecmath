@@ -57,6 +57,17 @@ public interface MVec2 extends Vec2 {
 	}
 
 	/**
+	 * Performs a linear interpolation between this and other.
+	 * this = this * (1-t) + other * t
+	 * @param other The other vector to interpolate to
+	 * @param t The time factor
+	 */
+	default void lerp(Vec2 other, double t) {
+		scale(1.0 - t);
+		scaleAdd(other, t);
+	}
+
+	/**
 	 * Sets this to be this + vec * scale
 	 * @param vec The vector to add
 	 * @param scale The number to scale it by

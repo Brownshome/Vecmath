@@ -114,6 +114,16 @@ class MVec2Test {
 	}
 
 	@Test
+	void lerp() {
+		Vec2 result = A;
+		A.lerp(Vec2.of(0.5, 0.1), 0.25);
+		Vec2 expected = Vec2.of(0.875, 0.025);
+
+		assertEquals(expected.x(), result.x(), ACCURACY);
+		assertEquals(expected.y(), result.y(), ACCURACY);
+	}
+
+	@Test
 	void negate() {
 		Vec2 result = A;
 		A.negate();
