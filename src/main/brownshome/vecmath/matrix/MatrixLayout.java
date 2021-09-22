@@ -9,25 +9,28 @@ package brownshome.vecmath.matrix;
  * @param columnStride the difference in indices that results from increasing the column index.
  *                     This may be negative (or zero if there are no columns)
  * @param offset the offset from the start of the array that this matrix shape will use
- * @param length the length of the region in the underlying backing array that must be valid. This is used to specify the
- *               minimum length of array that will be accepted by constructors and dictates the size of the created matrix
- *               in {@link MatrixView#copy(MatrixLayout)}
  */
-public record MatrixLayout(int rows, int columns, int rowStride, int columnStride, int offset, int length) {
+public record MatrixLayout(int rows, int columns, int rowStride, int columnStride, int offset) {
 	public MatrixLayout {
 		assert rows >= 0;
 		assert columns >= 0;
-		assert length >= 0;
-		assert noIndexesOverlap();
+		assert noIndexesOverlap(rows, columns, rowStride, columnStride, offset);
 	}
 
-	private boolean noIndexesOverlap() {
-		boolean[] v = new boolean[length];
+	private static boolean noIndexesOverlap(int rows, int columns, int rowStride, int columnStride, int offset) {
+		if (rows == 0 || columns == 0) {
+			return true;
+		}
 
-		for (int r = 0; r < rows; r++) {
-			for (int c = 0; c < columns; c++) {
-				int i = index(r, c);
-				if (i >= length || v[i]) {
+		int r = rowStride < 0 ? 0 : (rows - 1);
+		int c = columnStride < 0 ? 0 : (columns - 1);
+
+		boolean[] v = new boolean[offset + rowStride * r + columnStride * c + 1];
+
+		for (r = 0; r < rows; r++) {
+			for (c = 0; c < columns; c++) {
+				int i = r * rowStride + c * columnStride + offset;
+				if (i >= v.length || v[i]) {
 					return false;
 				}
 
@@ -47,19 +50,7 @@ public record MatrixLayout(int rows, int columns, int rowStride, int columnStrid
 	 * @param columnStride the column stride
 	 */
 	public MatrixLayout(int rows, int columns, int rowStride, int columnStride) {
-		this(rows, columns, rowStride, columnStride, 0, (rows - 1) * rowStride + (columns - 1) * columnStride + 1);
-	}
-
-	/**
-	 * Create a layout with a given row and column stride and offset. The length will be the minimum valid length
-	 * @param rows the number of rows
-	 * @param columns the number of columns
-	 * @param rowStride the row stride
-	 * @param columnStride the column stride
-	 * @param offset the offset
-	 */
-	public MatrixLayout(int rows, int columns, int rowStride, int columnStride, int offset) {
-		this(rows, columns, rowStride, columnStride, 0, (rows - 1) * rowStride + (columns - 1) * columnStride + 1);
+		this(rows, columns, rowStride, columnStride, 0);
 	}
 
 	/**
@@ -70,7 +61,7 @@ public record MatrixLayout(int rows, int columns, int rowStride, int columnStrid
 	 * @see MatrixLayout#isRowPacked()
 	 */
 	public static MatrixLayout rowMajor(int rows, int columns) {
-		return new MatrixLayout(rows, columns, columns, 1, 0, rows * columns);
+		return new MatrixLayout(rows, columns, columns, 1, 0);
 	}
 
 	/**
@@ -81,7 +72,7 @@ public record MatrixLayout(int rows, int columns, int rowStride, int columnStrid
 	 * @see MatrixLayout#isColumnPacked()
 	 */
 	public static MatrixLayout columnMajor(int rows, int columns) {
-		return new MatrixLayout(rows, columns, 1, rows, 0, rows * columns);
+		return new MatrixLayout(rows, columns, 1, rows, 0);
 	}
 
 	/**
@@ -115,7 +106,7 @@ public record MatrixLayout(int rows, int columns, int rowStride, int columnStrid
 	 * @return a layout that views the same array as its transpose
 	 */
 	public MatrixLayout transpose() {
-		return new MatrixLayout(columns, rows, columnStride, rowStride, offset, length);
+		return new MatrixLayout(columns, rows, columnStride, rowStride, offset);
 	}
 
 	/**
@@ -148,7 +139,7 @@ public record MatrixLayout(int rows, int columns, int rowStride, int columnStrid
 	 * @return the same layout as this but with a given offset
 	 */
 	public MatrixLayout offset(int offset) {
-		return new MatrixLayout(rows, columns, rowStride, columnStride, offset, length);
+		return new MatrixLayout(rows, columns, rowStride, columnStride, offset);
 	}
 
 	/**
@@ -197,8 +188,21 @@ public record MatrixLayout(int rows, int columns, int rowStride, int columnStrid
 		assert rows >= 0 && r >= 0 && r + rows <= rows();
 		assert columns >= 0 && c >= 0 && c + columns <= columns();
 
-		int offset = index(r, c);
+		return new MatrixLayout(rows, columns, rowStride, columnStride, index(r, c));
+	}
 
-		return new MatrixLayout(rows, columns, rowStride, columnStride, offset, length - offset);
+	/**
+	 * Returns the length of array required to hold this matrix layout
+	 * @return the minimum array length
+	 */
+	public int requiredArrayLength() {
+		if (rows == 0 || columns == 0) {
+			return 0;
+		}
+
+		int r = rowStride < 0 ? 0 : (rows - 1);
+		int c = columnStride < 0 ? 0 : (columns - 1);
+
+		return index(r, c) + 1;
 	}
 }

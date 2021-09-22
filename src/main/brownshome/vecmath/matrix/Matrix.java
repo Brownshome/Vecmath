@@ -9,8 +9,8 @@ public final class Matrix implements MatrixView {
 	private final MatrixLayout layout;
 	private final double[] m;
 
-	Matrix(double[] m, MatrixLayout layout) {
-		assert m.length >= layout.offset() + layout.length();
+	private Matrix(double[] m, MatrixLayout layout) {
+		assert m.length >= layout.requiredArrayLength();
 
 		this.m = m;
 		this.layout = layout;
@@ -40,7 +40,7 @@ public final class Matrix implements MatrixView {
 	 * @return a new matrix backed by the given array
 	 */
 	public static Matrix of(double[] matrix, int offset, int rowStride, int columnStride, int rows, int columns) {
-		return new Matrix(matrix, new MatrixLayout(rows, columns, rowStride, columnStride, offset, matrix.length));
+		return new Matrix(matrix, new MatrixLayout(rows, columns, rowStride, columnStride, offset));
 	}
 
 	public static Matrix of(double[] matrix, MatrixLayout layout) {
@@ -65,7 +65,7 @@ public final class Matrix implements MatrixView {
 	}
 
 	public static Matrix zeros(MatrixLayout layout) {
-		return of(new double[layout.offset() + layout.length()], layout);
+		return of(new double[layout.requiredArrayLength()], layout);
 	}
 
 	public static Matrix constant(double value, int rows, int columns) {
@@ -75,7 +75,7 @@ public final class Matrix implements MatrixView {
 	}
 
 	public static Matrix constant(double value, MatrixLayout layout) {
-		double[] array = new double[layout.offset() + layout.length()];
+		double[] array = new double[layout.requiredArrayLength()];
 		Arrays.fill(array, layout.offset(), array.length, value);
 		return of(array, layout);
 	}
