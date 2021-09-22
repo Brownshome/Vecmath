@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'brownshome'
-version = '3.4.1'
+version = '3.5.0-vector'
 
 repositories {
 	mavenCentral()
@@ -18,6 +18,11 @@ java {
 
 tasks.withType(JavaCompile) {
 	options.encoding = 'utf-8'
+	options.compilerArgs += ['--add-modules', 'jdk.incubator.vector']
+}
+
+javadoc {
+	options.encoding = 'utf-8'
 }
 
 sourceSets {
@@ -27,11 +32,11 @@ sourceSets {
 }
 
 jmh {
-	fork = 1
-	warmupIterations = 2
-	iterations = 5
+	includes = ['\\.(factorise|solve|divide)']
+
 	benchmarkMode = ['AverageTime']
 	timeUnit = 'us'
+	fork = 1
 
 	jvmArgsPrepend = ['--add-modules jdk.incubator.vector']
 }
@@ -85,6 +90,7 @@ dependencies {
 
 test {
 	useJUnitPlatform()
+	enableAssertions = true
 	jvmArgs += [
 			'--add-modules',
 			'jdk.incubator.vector'
