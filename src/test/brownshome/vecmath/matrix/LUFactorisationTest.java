@@ -1,6 +1,9 @@
 package brownshome.vecmath.matrix;
 
-import brownshome.vecmath.CompareConstant;
+import brownshome.vecmath.VecmathTesting;
+import brownshome.vecmath.matrix.factorisation.SingularMatrixException;
+import brownshome.vecmath.matrix.factorisation.basic.LowerUpperFactorisation;
+import brownshome.vecmath.matrix.layout.MatrixLayout;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -14,21 +17,21 @@ class LUFactorisationTest {
 				-.75, 2.125
 		};
 
-		Matrix a = Matrix.of(new double[] {
+		var a = Matrix.of(new double[] {
 				0.0, -1.0, 0.5,
 				-1.0, -1.0, 1.5,
 				2.0, 0.0, 0.0
-		}, 3, 3);
+		}, MatrixLayout.ofRowMajor(3, 3));
 
 		Matrix b = Matrix.of(new double[] {
 				1, 0, .5,
 				-1, 1, .25
-		}, 2, 3).transpose();
+		}, MatrixLayout.ofRowMajor(2, 3)).transpose();
 
-		var factorisation = new LUFactorisation(a, 0.0);
-		var result = factorisation.leftSolve(b).copy().backingArray();
+		var factorisation = new LowerUpperFactorisation(a, 0.0);
+		var result = factorisation.leftSolve(b).asArrayBacked().backingArray();
 
-		assertArrayEquals(expected, result, CompareConstant.ACCURACY);
+		assertArrayEquals(expected, result, VecmathTesting.ACCURACY);
 	}
 
 	@Test
@@ -38,21 +41,21 @@ class LUFactorisationTest {
 				-1.75, .75, -.125
 		};
 
-		Matrix a = Matrix.of(new double[] {
+		var a = Matrix.of(new double[] {
 				0.0, -1.0, 0.5,
 				-1.0, -1.0, 1.5,
 				2.0, 0.0, 0.0
-		}, 3, 3);
+		}, MatrixLayout.ofRowMajor(3, 3));
 
 		Matrix b = Matrix.of(new double[] {
 				1, 0, .5,
 				-1, 1, .25
-		}, 2, 3);
+		}, MatrixLayout.ofRowMajor(2, 3));
 
-		var factorisation = new LUFactorisation(a, 0.0);
-		var result = factorisation.rightSolve(b).copy().backingArray();
+		var factorisation = new LowerUpperFactorisation(a, 0.0);
+		var result = factorisation.rightSolve(b).arrayBackedCopy().backingArray();
 
-		assertArrayEquals(expected, result, CompareConstant.ACCURACY);
+		assertArrayEquals(expected, result, VecmathTesting.ACCURACY);
 	}
 
 	@Test
@@ -62,21 +65,21 @@ class LUFactorisationTest {
 				-2.75, 1.75, .75
 		};
 
-		Matrix a = Matrix.of(new double[] {
+		var a = Matrix.of(new double[] {
 				0.0, -1.0, 0.5,
 				-1.0, -1.0, .5,
 				1.0, 0.0, 1.0
-		}, 3, 3);
+		}, MatrixLayout.ofRowMajor(3, 3));
 
 		Matrix b = Matrix.of(new double[] {
 				1, 0, .5,
 				-1, 1, .25
-		}, 2, 3);
+		}, MatrixLayout.ofRowMajor(2, 3));
 
-		var factorisation = new LUFactorisation(a, 0.0);
-		var result = factorisation.rightSolve(b).copy().backingArray();
+		var factorisation = new LowerUpperFactorisation(a, 0.0);
+		var result = factorisation.rightSolve(b).arrayBackedCopy().backingArray();
 
-		assertArrayEquals(expected, result, CompareConstant.ACCURACY);
+		assertArrayEquals(expected, result, VecmathTesting.ACCURACY);
 	}
 
 	@Test
@@ -87,39 +90,39 @@ class LUFactorisationTest {
 				-1, 1, .5
 		};
 
-		Matrix a = Matrix.of(new double[] {
+		var a = Matrix.of(new double[] {
 				0.0, -1.0, 0.5,
 				-1.0, -1.0, 1.5,
 				2.0, 0.0, 0.0
-		}, 3, 3);
+		}, MatrixLayout.ofRowMajor(3, 3));
 
-		var factorisation = new LUFactorisation(a, 0.0);
-		var result = factorisation.inverse().copy().backingArray();
+		var factorisation = new LowerUpperFactorisation(a, 0.0);
+		var result = factorisation.inverse().asArrayBacked().backingArray();
 
-		assertArrayEquals(expected, result, CompareConstant.ACCURACY);
+		assertArrayEquals(expected, result, VecmathTesting.ACCURACY);
 	}
 
 	@Test
 	void determinant() {
-		Matrix m = Matrix.of(new double[] {
+		var m = Matrix.of(new double[] {
 				0.0, -1.0, 0.5,
 				-1.0, -1.0, 1.5,
 				2.0, 0.0, 0.0
-		}, 3, 3);
+		}, MatrixLayout.ofRowMajor(3, 3));
 
 		var factorisation = new LUFactorisation(m, 0.0);
 
-		assertEquals(-2.0, factorisation.determinant(), CompareConstant.ACCURACY);
+		assertEquals(-2.0, factorisation.determinant(), VecmathTesting.ACCURACY);
 	}
 
 	@Test
 	void failsForSingularMatrix() {
-		Matrix m = Matrix.of(new double[] {
+		var m = Matrix.of(new double[] {
 				0.0, -1.0 / 3.0, 0.5,
 				-1.0, -1.0, 1.5,
 				2.0, 0.0, 0.0
-		}, 3, 3);
+		}, MatrixLayout.ofRowMajor(3, 3));
 
-		assertThrows(SingularMatrixException.class, () -> new LUFactorisation(m, CompareConstant.ACCURACY));
+		assertThrows(SingularMatrixException.class, () -> new LUFactorisation(m, VecmathTesting.ACCURACY));
 	}
 }

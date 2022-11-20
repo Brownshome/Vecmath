@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ArrayMatrixViewTest {
+class NestedArrayMatrixTest {
 	@Test
 	void testArrayMatrix() {
-		var matrix = MatrixView.of(new double[][] {
+		var matrix = Matrix.ofRows(new double[][] {
 				{ 1, 2, 3 },
 				{ 3, 2, 1 },
 				{ 5, 5, 5 },
