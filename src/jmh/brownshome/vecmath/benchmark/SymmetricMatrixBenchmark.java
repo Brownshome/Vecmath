@@ -3,6 +3,8 @@ package brownshome.vecmath.benchmark;
 import java.util.Random;
 
 import brownshome.vecmath.matrix.*;
+import brownshome.vecmath.matrix.basic.SymmetricMatrixView;
+import brownshome.vecmath.matrix.factorisation.Factorisation;
 import org.openjdk.jmh.annotations.*;
 
 public class SymmetricMatrixBenchmark {

@@ -55,7 +55,7 @@ public record MatrixVecNLayout(MatrixLayout delegate) implements VecNLayout {
 	public MatrixLayout asColumnMatrix() {
 		return delegate;
 	}
-
+	
 	@Override
 	public String toString() {
 		return delegate.toString();

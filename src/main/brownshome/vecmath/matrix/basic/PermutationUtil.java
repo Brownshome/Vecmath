@@ -1,12 +1,14 @@
-package brownshome.vecmath.matrix;
+package brownshome.vecmath.matrix.basic;
 
-interface PermutationUtil {
-	static int[] combinePermutations(int[] existing, int[] nextPermutation) {
-		if (existing == null) {
+public record PermutationUtil() {
+	public static final int[] IDENTITY_PERMUTATION = null;
+
+	public static int[] combinePermutations(int[] existing, int[] nextPermutation) {
+		if (existing == IDENTITY_PERMUTATION) {
 			return nextPermutation;
 		}
 
-		if (nextPermutation == null) {
+		if (nextPermutation == IDENTITY_PERMUTATION) {
 			return existing;
 		}
 
@@ -20,12 +22,12 @@ interface PermutationUtil {
 			}
 		}
 
-		return isIdentity ? null : combined;
+		return isIdentity ? IDENTITY_PERMUTATION : combined;
 	}
 
-	static int[] invertPermutation(int[] permutation) {
-		if (permutation == null) {
-			return null;
+	public static int[] invertPermutation(int[] permutation) {
+		if (permutation == IDENTITY_PERMUTATION) {
+			return IDENTITY_PERMUTATION;
 		}
 
 		int[] inverted = new int[permutation.length];
@@ -37,11 +39,11 @@ interface PermutationUtil {
 			}
 		}
 
-		return isIdentity ? null : inverted;
+		return isIdentity ? IDENTITY_PERMUTATION : inverted;
 	}
 
-	static int parity(int[] permutation) {
-		if (permutation == null) {
+	public static int parity(int[] permutation) {
+		if (permutation == IDENTITY_PERMUTATION) {
 			return 1;
 		}
 

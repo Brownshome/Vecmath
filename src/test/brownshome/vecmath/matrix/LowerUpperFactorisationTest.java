@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class LUFactorisationTest {
+class LowerUpperFactorisationTest {
 	@Test
 	void leftSolve() {
 		double[] expected = new double[] {
@@ -110,7 +110,7 @@ class LUFactorisationTest {
 				2.0, 0.0, 0.0
 		}, MatrixLayout.ofRowMajor(3, 3));
 
-		var factorisation = new LUFactorisation(m, 0.0);
+		var factorisation = new LowerUpperFactorisation(m, 0.0);
 
 		assertEquals(-2.0, factorisation.determinant(), VecmathTesting.ACCURACY);
 	}
@@ -123,6 +123,6 @@ class LUFactorisationTest {
 				2.0, 0.0, 0.0
 		}, MatrixLayout.ofRowMajor(3, 3));
 
-		assertThrows(SingularMatrixException.class, () -> new LUFactorisation(m, VecmathTesting.ACCURACY));
+		assertThrows(SingularMatrixException.class, () -> new LowerUpperFactorisation(m, VecmathTesting.ACCURACY));
 	}
 }

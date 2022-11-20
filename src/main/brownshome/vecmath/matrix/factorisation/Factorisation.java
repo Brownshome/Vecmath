@@ -1,4 +1,6 @@
-package brownshome.vecmath.matrix;
+package brownshome.vecmath.matrix.factorisation;
+
+import brownshome.vecmath.matrix.Matrix;
 
 /**
  * A factorisation of a matrix that allows the swift computation of the solutions to AX = B, XA = B, AX = I, |A| = x
@@ -11,21 +13,21 @@ public interface Factorisation {
 	 * @param other B
 	 * @return the solution X to AX = B
 	 */
-	MatrixView leftSolve(MatrixView other);
+	Matrix leftSolve(Matrix other);
 
 	/**
 	 * Computes the solution to XA = B, or in other words finds B / A
 	 * @param other B
 	 * @return the solution X to XA = B
 	 */
-	MatrixView rightSolve(MatrixView other);
+	Matrix rightSolve(Matrix other);
 
 	/**
-	 * Finds A^-1
+	 * Finds A⁻¹
 	 * @return the inverse of A
 	 */
-	default MatrixView inverse() {
-		return leftSolve(MatrixView.identity(size()));
+	default Matrix inverse() {
+		return leftSolve(Matrix.identity(size()));
 	}
 
 	/**

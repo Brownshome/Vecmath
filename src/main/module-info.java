@@ -6,12 +6,15 @@
  *  - 3D Rotations given in axis-angle formulation are clockwise looking along the axis that are defined relative to
  */
 module brownshome.vecmath {
-	exports brownshome.vecmath.matrix;
-
 	exports brownshome.vecmath.vector;
 	exports brownshome.vecmath.vector.array;
 	exports brownshome.vecmath.vector.layout;
 
 	exports brownshome.vecmath.rotation;
 	exports brownshome.vecmath.rotation.array;
+
+	exports brownshome.vecmath.matrix;
+	exports brownshome.vecmath.matrix.array;
+	exports brownshome.vecmath.matrix.layout;
+	exports brownshome.vecmath.matrix.factorisation;
 }

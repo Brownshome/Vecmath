@@ -1,338 +1,505 @@
 package brownshome.vecmath.matrix;
 
-import java.util.Arrays;
+import brownshome.vecmath.generic.GenericElement;
+import brownshome.vecmath.matrix.array.ArrayMatrix;
+import brownshome.vecmath.matrix.basic.*;
+import brownshome.vecmath.matrix.factorisation.Factorisation;
+import brownshome.vecmath.matrix.factorisation.basic.LowerUpperFactorisation;
+import brownshome.vecmath.matrix.layout.MatrixLayout;
+import brownshome.vecmath.vector.*;
+import brownshome.vecmath.vector.basic.MatrixVecN;
 
 /**
- * An arbitrary size matrix of double precision
+ * A matrix
  */
-public final class Matrix implements MatrixView {
-	private final MatrixLayout layout;
-	private final double[] m;
-
-	private Matrix(double[] m, MatrixLayout layout) {
-		assert m.length >= layout.requiredArrayLength();
-
-		this.m = m;
-		this.layout = layout;
-	}
-
+public interface Matrix extends GenericElement<Matrix> {
 	/**
-	 * Creates a matrix from an input array, note that the input array is not copied and will be the backing array for the
-	 * created matrix. The input array is expected to be in row-major order.
-	 * @param matrix the backing array
+	 * A matrix with a single value
+	 * @param value the value
 	 * @param rows the number of rows
 	 * @param columns the number of columns
-	 * @return a new matrix backed by the given array
+	 * @return a matrix
 	 */
-	public static Matrix of(double[] matrix, int rows, int columns) {
-		return of(matrix, 0, columns, 1, rows, columns);
+	static Matrix constant(double value, int rows, int columns) {
+		return new ConstantMatrix(value, rows, columns);
 	}
 
 	/**
-	 * Creates a matrix from an input array, note that the input array is not copied and will be the backing array for the
-	 * created matrix
-	 * @param matrix the backing array
-	 * @param offset the index of the first item in the array
-	 * @param columnStride the index difference between columns
-	 * @param rowStride the index difference between rows
+	 * A zero matrix
 	 * @param rows the number of rows
 	 * @param columns the number of columns
-	 * @return a new matrix backed by the given array
+	 * @return a matrix
 	 */
-	public static Matrix of(double[] matrix, int offset, int rowStride, int columnStride, int rows, int columns) {
-		return new Matrix(matrix, new MatrixLayout(rows, columns, rowStride, columnStride, offset));
-	}
-
-	public static Matrix of(double[] matrix, MatrixLayout layout) {
-		return new Matrix(matrix, layout);
-	}
-
-	public static Matrix identity(int size) {
-		return MatrixView.identity(size).asMatrix();
+	static Matrix zero(int rows, int columns) {
+		return new ZeroMatrix(rows, columns);
 	}
 
 	/**
-	 * Creates an identity matrix with the given layout
-	 * @param layout the layout, this must be a square layout
-	 * @return an identity matrix
+	 * A matrix with a single known value on the leading diagonal
+	 * @param value the value
+	 * @param size the number of rows and columns
+	 * @return a matrix
 	 */
-	public static Matrix identity(MatrixLayout layout) {
-		return MatrixView.identity(layout.rows()).asMatrix(layout);
-	}
-
-	public static Matrix zeros(int rows, int columns) {
-		return of(new double[rows * columns], rows, columns);
-	}
-
-	public static Matrix zeros(MatrixLayout layout) {
-		return of(new double[layout.requiredArrayLength()], layout);
-	}
-
-	public static Matrix constant(double value, int rows, int columns) {
-		double[] array = new double[rows * columns];
-		Arrays.fill(array, value);
-		return of(array, rows, columns);
-	}
-
-	public static Matrix constant(double value, MatrixLayout layout) {
-		double[] array = new double[layout.requiredArrayLength()];
-		Arrays.fill(array, layout.offset(), array.length, value);
-		return of(array, layout);
-	}
-
-	public static Matrix diagonal(double value, int size) {
-		return MatrixView.diagonal(value, size).asMatrix();
+	static Matrix diagonal(double value, int size) {
+		return new DiagonalMatrix(value, size);
 	}
 
 	/**
-	 * Creates a diagonal matrix with the given layout
-	 * @param layout the layout, this must be a square layout
-	 * @param value the value on the diagonal
-	 * @return an diagonal matrix
+	 * The identity matrix
+	 * @param size the number of rows and columns
+	 * @return a matrix
 	 */
-	public static Matrix diagonal(double value, MatrixLayout layout) {
-		return MatrixView.diagonal(value, layout.rows()).asMatrix(layout);
+	static Matrix identity(int size) {
+		return new IdentityMatrix(size);
 	}
 
 	/**
-	 * Returns the index in the backing array of the given row / column
-	 * @param r the row
-	 * @param c the column
-	 * @return an index into the array
+	 * A mutable matrix with a given number of rows and columns
+	 * @param rows the number of rows
+	 * @param columns the number of columns
+	 * @return a mutable matrix
 	 */
-	public int index(int r, int c) {
-		return layout.index(r, c);
-	}
-
-	@Override
-	public double get(int row, int column) {
-		return m[index(row, column)];
-	}
-
-	public MatrixLayout layout() {
-		return layout;
-	}
-
-	@Override
-	public int rows() {
-		return layout.rows();
-	}
-
-	@Override
-	public int columns() {
-		return layout.columns();
+	static MMatrix of(int rows, int columns) {
+		return of(MatrixLayout.ofOptimal(rows, columns));
 	}
 
 	/**
-	 * The index of the (0, 0) in the array
-	 * @return the index
+	 * A mutable column-matrix with the given number of rows
+	 * @param rows the number of rows
+	 * @return a mutable matrix
 	 */
-	public int offset() {
-		return layout.offset();
+	static MMatrix ofColumn(int rows) {
+		return of(rows, 1);
 	}
 
 	/**
-	 * The difference between any two positions that differ by one row
-	 * @return index(1, 0) - index(0, 0)
+	 * A mutable column-matrix with the given rows
+	 * @param rows the rows of the matrix
+	 * @return a mutable matrix
 	 */
-	public int rowStride() {
-		return layout.rowStride();
+	static MMatrix ofColumn(double... rows) {
+		return new BasicMatrix(rows, MatrixLayout.ofOptimal(rows.length, 1));
 	}
 
 	/**
-	 * The difference between any two positions that differ by one column
-	 * @return index(0, 1) - index(0, 0)
+	 * A mutable matrix with the given columns
+	 * @param columns the columns of the matrix
+	 * @return a mutable matrix
 	 */
-	public int columnStride() {
-		return layout.columnStride();
+	static MMatrix ofColumns(double[]... columns) {
+		return new NestedArrayMatrix(columns).transpose();
+	}
+
+
+	/**
+	 * A mutable row-matrix with the given number of columns
+	 * @param columns the number of columns
+	 * @return a mutable matrix
+	 */
+	static MMatrix ofRow(int columns) {
+		return of(1, columns);
 	}
 
 	/**
-	 * Gets the backing array of this matrix. Writes to this array will impact the matrix
-	 *
-	 * @return a backing array for this matrix
+	 * A mutable row-matrix with the given columns
+	 * @param columns the columns of the matrix
+	 * @return a mutable matrix
 	 */
-	public double[] backingArray() {
-		return m;
-	}
-
-	public Matrix subMatrix(int r, int c, int rows, int columns) {
-		return of(m, layout.subLayout(r, c, rows, columns));
+	static MMatrix ofRow(double... columns) {
+		return new BasicMatrix(columns, MatrixLayout.ofOptimal(1, columns.length));
 	}
 
 	/**
-	 * Adds a matrix to this object, mutating this matrix
-	 * @param other the matrix to add
+	 * A mutable matrix with the given rows
+	 * @param rows the rows of the matrix
+	 * @return a mutable matrix
 	 */
-	public void add(MatrixView other) {
-		assert other.columns() == columns() && other.rows() == rows();
+	static MMatrix ofRows(double[]... rows) {
+		return new NestedArrayMatrix(rows);
+	}
 
-		if (other instanceof Matrix) {
-			add((Matrix) other);
-		} else {
-			slowAddPath(other);
+	/**
+	 * An array-backed matrix with the given layout
+	 * @param layout the layout
+	 * @return an array-backed matrix
+	 */
+	static ArrayMatrix of(MatrixLayout layout) {
+		return new BasicMatrix(new double[layout.end()], layout);
+	}
+
+	/**
+	 * An array-backed matrix with the given layout
+	 * @param matrix the backing array for this matrix
+	 * @param layout the layout of the matrix
+	 * @return an array-backed matrix
+	 */
+	static ArrayMatrix of(double[] matrix, MatrixLayout layout) {
+		return new BasicMatrix(matrix, layout);
+	}
+
+	/**
+	 * Creates a symmetric matrix with the given rows and columns. Setting an item in this matrix will also set the symmetric item
+	 * @param size the size of this matrix
+	 * @return a symmetric modifiable matrix
+	 */
+	static MMatrix ofSymmetric(int size) {
+		return ofSymmetric(MatrixLayout.ofSymmetricRowMajor(size));
+	}
+
+	/**
+	 * Creates a symmetric matrix with the given matrix layout
+	 * @param layout the layout of this matrix
+	 * @return a symmetric array-backed matrix
+	 */
+	static ArrayMatrix ofSymmetric(MatrixLayout layout) {
+		assert layout.rows() == layout.columns();
+		return ofSymmetric(new double[layout.end()], layout);
+	}
+
+	/**
+	 * Creates a symmetric matrix with the given matrix layout
+	 * @param matrix the backing array for this matrix
+	 * @param layout the layout of this matrix
+	 * @return a symmetric array-backed matrix
+	 */
+	static ArrayMatrix ofSymmetric(double[] matrix, MatrixLayout layout) {
+		return new BasicSymmetricMatrix(matrix, layout);
+	}
+
+	/**
+	 * The number of rows in this matrix
+	 * @return the number of rows
+	 */
+	int rows();
+
+	/**
+	 * The number of columns in this matrix
+	 * @return the number of columns
+	 */
+	int columns();
+
+	/**
+	 * If iterating along a row of this matrix is cache-friendly
+	 * @return a boolean
+	 */
+	default boolean isRowOptimal() {
+		return columns() < 2;
+	}
+
+	/**
+	 * If iterating along a column of this matrix is cache-friendly
+	 * @return a boolean
+	 */
+	default boolean isColumnOptimal() {
+		return rows() < 2;
+	}
+
+	/**
+	 * Gets a value from this matrix
+	 * @param row the row
+	 * @param column the column
+	 * @return the value
+	 */
+	double get(int row, int column);
+
+	/**
+	 * Creates a sub-matrix view of this matrix
+	 * @param r the starting row
+	 * @param c the starting column
+	 * @param rows the number of rows
+	 * @param columns the number of columns
+	 * @return a matrix
+	 */
+	default Matrix subMatrix(int r, int c, int rows, int columns) {
+		return new SubMatrix(this, r, c, rows, columns);
+	}
+
+	/**
+	 * Gets a row of this matrix as an unknown-size vector
+	 * @param r the row index
+	 * @return a vector of unknown size
+	 */
+	default VecN row(int r) {
+		return transpose().column(r);
+	}
+
+	/**
+	 * Gets a column of this matrix as an unknown-size vector
+	 * @param c the column index
+	 * @return a vector of unknown size
+	 */
+	default VecN column(int c) {
+		return new MatrixVecN(this, c);
+	}
+
+	/**
+	 * Gets the transposed view of this matrix
+	 * @return a matrix
+	 */
+	default Matrix transpose() {
+		return new TransposedMatrix(this);
+	}
+
+	/**
+	 * Gets the invert matrix
+	 * @return a matrix
+	 * @throws brownshome.vecmath.matrix.factorisation.SingularMatrixException if this matrix is not invertible
+	 */
+	default Matrix invert() {
+		return factorisation().inverse();
+	}
+
+	/**
+	 * Gets a permuted view of this matrix
+	 * @param rows the permutation to apply. Each index is the location in the new matrix of the ith row
+	 * @return a matrix
+	 */
+	default Matrix permuteByRow(int... rows) {
+		return PermutedMatrix.rows(this, rows);
+	}
+
+	/**
+	 * Gets a permuted view of this matrix
+	 * @param columns the permutation to apply. Each index is the location in the new matrix of the ith column
+	 * @return a matrix
+	 */
+	default Matrix permuteByColumn(int... columns) {
+		return PermutedMatrix.columns(this, columns);
+	}
+
+	/**
+	 * The factorisation of this matrix
+	 * @return a factorisation
+	 */
+	default Factorisation factorisation() {
+		return factorisation(1e-10);
+	}
+
+	/**
+	 * The factorisation of this matrix
+	 * @param tolerance the tolerance to use
+	 * @return a factorisation
+	 */
+	default Factorisation factorisation(double tolerance) {
+		return new LowerUpperFactorisation(arrayBackedCopy(), tolerance);
+	}
+
+	/**
+	 * Gets the result of multiplying this matrix by the other one
+	 * @param other the other matrix
+	 * @return a matrix
+	 */
+	default Matrix multiply(Matrix other) {
+		assert columns() == other.rows();
+
+		if (other instanceof MatrixWithFastMultiply fast) {
+			return fast.multiplyLeft(this);
 		}
-	}
 
-	/**
-	 * Adds a matrix to this object, mutating this matrix
-	 * @param other the matrix to add
-	 */
-	public void add(Matrix other) {
-		if (other.rowStride() == rowStride() && other.columnStride() == columnStride() && layout.isPacked()) {
-			for (int i = 0; i < rows() * columns(); i++) {
-				m[offset() + i] += other.m[other.offset() + i];
+		// Attempt to find the most cache-friendly result
+		MMatrix result;
+		if (other.isRowOptimal()) {
+			result = Matrix.of(MatrixLayout.ofRowMajor(rows(), other.columns()));
+			for (int r = 0; r < rows(); r++) for (int k = 0; k < columns(); k++) for (int c = 0; c < other.columns(); c++) {
+				var value = result.get(r, c);
+				value += get(r, k) * other.get(k, c);
+				result.set(value, r, c);
+			}
+		} else if (isColumnOptimal()) {
+			result = Matrix.of(MatrixLayout.ofColumnMajor(rows(), other.columns()));
+			for (int c = 0; c < other.columns(); c++) for (int k = 0; k < columns(); k++) for (int r = 0; r < rows(); r++) {
+				var value = result.get(r, c);
+				value += get(r, k) * other.get(k, c);
+				result.set(value, r, c);
+			}
+		} else if (other.isColumnOptimal() && isRowOptimal()) {
+			result = Matrix.of(MatrixLayout.ofOptimal(rows(), other.columns()));
+			for (int r = 0; r < rows(); r++) for (int c = 0; c < other.columns(); c++) {
+				double value = 0.0;
+
+				for (int k = 0; k < columns(); k++) {
+					value += get(r, k) * other.get(k, c);
+				}
+
+				result.set(value, r, c);
 			}
 		} else {
-			slowAddPath(other);
+			result = Matrix.of(MatrixLayout.ofRowMajor(rows(), other.columns()));
+			for (int k = 0; k < columns(); k++) {
+				var otherRow = other.subMatrix(k, 0, 1, other.columns()).copy();
+
+				for (int r = 0; r < rows(); r++) for (int c = 0; c < otherRow.columns(); c++) {
+					var value = result.get(r, c);
+					value += get(r, k) * otherRow.get(0, c);
+					result.set(value, r, c);
+				}
+			}
 		}
+
+		return result;
 	}
 
-	private void slowAddPath(MatrixView other) {
+	/**
+	 * Returns a matrix such that the divider multiplied by that matrix equals this matrix
+	 * @param divider the matrix to divide by
+	 * @return the result of the division
+	 * @throws brownshome.vecmath.matrix.factorisation.SingularMatrixException if the divider matrix is singular, or close to singular
+	 */
+	default Matrix divideLeft(Matrix divider) {
+		return divider.factorisation().leftSolve(this);
+	}
+
+	/**
+	 * Returns a matrix such that that matrix multiplied by the divider equals this matrix
+	 * @param divider the matrix to divide by
+	 * @return the result of the division
+	 * @throws brownshome.vecmath.matrix.factorisation.SingularMatrixException if the divider matrix is singular, or close to singular
+	 */
+	default Matrix divideRight(Matrix divider) {
+		return divider.factorisation().rightSolve(this);
+	}
+
+	/**
+	 * The determinant of this matrix
+	 * @return the determinant
+	 */
+	default double determinant() {
+		return factorisation().determinant();
+	}
+
+	/**
+	 * Joins the rows of this matrix and the given matrix
+	 * @param other the other matrix
+	 * @return a combined matrix
+	 */
+	default Matrix joinRows(Matrix other) {
+		assert rows() == other.rows();
+		return transpose().joinColumns(other.transpose()).transpose();
+	}
+
+	/**
+	 * Joins the columns of this matrix and the given matrix
+	 * @param other the other matrix
+	 * @return a combined matrix
+	 */
+	default Matrix joinColumns(Matrix other) {
+		assert columns() == other.columns();
+		return new JoinedMatrix(this, other);
+	}
+
+	/**
+	 * Returns true if this matrix exactly equals the other matrix
+	 * @param other the other element
+	 * @return a boolean
+	 */
+	@Override
+	default boolean exactEquals(Matrix other) {
 		for (int r = 0; r < rows(); r++) for (int c = 0; c < columns(); c++) {
-			m[index(r, c)] += other.get(r, c);
-		}
-	}
-
-	/**
-	 * Adds scale * matrix to this object, mutating this matrix
-	 * @param scale the scale to use
-	 * @param other the matrix to add
-	 */
-	public void scaleAdd(double scale, MatrixView other) {
-		assert other.columns() == columns() && other.rows() == rows();
-
-		if (other instanceof Matrix) {
-			scaleAdd(scale, (Matrix) other);
-		} else {
-			slowScaleAddPath(scale, other);
-		}
-	}
-
-	/**
-	 * Adds a matrix to this object, mutating this matrix
-	 * @param scale the scale to use
-	 * @param other the matrix to add
-	 */
-	public void scaleAdd(double scale, Matrix other) {
-		if (other.rowStride() == rowStride() && other.columnStride() == columnStride() && layout.isPacked()) {
-			for (int i = 0; i < rows() * columns(); i++) {
-				m[offset() + i] += scale * other.m[other.offset() + i];
-			}
-		} else {
-			slowScaleAddPath(scale, other);
-		}
-	}
-
-	private void slowScaleAddPath(double scale, MatrixView other) {
-		for (int r = 0; r < rows(); r++) for (int c = 0; c < columns(); c++) {
-			m[index(r, c)] += scale * other.get(r, c);
-		}
-	}
-
-	/**
-	 * Sets this matrix to be <code>this * scale</code>, mutating this matrix
-	 * @param scale the scale to use
-	 */
-	public void scale(double scale) {
-		if (layout.isPacked()) {
-			for (int i = 0; i < rows() * columns(); i++) {
-				m[offset() + i] *= scale;
-			}
-		} else {
-			for (int r = 0; r < rows(); r++) for (int c = 0; c < columns(); c++) {
-				m[index(r, c)] *= scale;
+			if (get(r, c) != other.get(r, c)) {
+				return false;
 			}
 		}
+
+		return true;
 	}
 
 	/**
-	 * Sets this matrix to be <code>other .* scale</code>, mutating this matrix
-	 * @param scale the scale to use
+	 * Returns this matrix as a single value, if it is one
+	 * @return the single value in this matrix
 	 */
-	public void scale(MatrixView scale) {
-		assert scale.columns() == columns() && scale.rows() == rows();
+	default double asValue() {
+		assert rows() == 1;
+		assert columns() == 1;
 
-		if (scale instanceof Matrix matrix) {
-			scale(matrix);
-		} else {
-			slowScalePath(scale);
-		}
+		return get(0, 0);
 	}
 
 	/**
-	 * Sets this matrix to be <code>other .* scale</code>, mutating this matrix
-	 * @param scale the scale to use
+	 * Returns this matrix as a row vector, if it is one
+	 * @return the row of this matrix as an unknown-size vector
 	 */
-	public void scale(Matrix scale) {
-		if (scale.rowStride() == rowStride() && scale.columnStride() == columnStride() && layout.isPacked()) {
-			for (int i = 0; i < rows() * columns(); i++) {
-				m[offset() + i] *= scale.m[scale.offset() + i];
-			}
-		} else {
-			slowScalePath(scale);
-		}
-	}
+	default VecN asRowVec() {
+		assert rows() == 1;
 
-	private void slowScalePath(MatrixView scale) {
-		for (int r = 0; r < rows(); r++) for (int c = 0; c < columns(); c++) {
-			m[index(r, c)] *= scale.get(r, c);
-		}
-	}
-
-	public void set(double value, int row, int column) {
-		m[index(row, column)] = value;
+		return row(0);
 	}
 
 	/**
-	 * Sets this matrix to equal another one
-	 * @param other the matrix to read
+	 * Returns this matrix as a column vector, if it is one
+	 * @return the column of this matrix as an unknown-size vector
 	 */
-	public void set(MatrixView other) {
-		assert other.columns() == columns() && other.rows() == rows();
-
-		if (other instanceof Matrix) {
-			set((Matrix) other);
-		} else {
-			slowPathSet(other);
-		}
+	default VecN asColumnVec() {
+		return column(0);
 	}
 
 	/**
-	 * Sets this matrix to equal another one
-	 * @param other the matrix to read
+	 * Returns this matrix as a symmetric matrix
+	 * @return a symmetric matrix
 	 */
-	public void set(Matrix other) {
-		if (other.rowStride() == rowStride() && other.columnStride() == columnStride() && layout.isPacked()) {
-			System.arraycopy(other.m, other.offset(), m, offset(), rows() * columns());
-		} else {
-			slowPathSet(other);
-		}
+	default Matrix asSymmetric() {
+		assert exactEquals(transpose());
+
+		return new WrappedSymmetricMatrix(this);
 	}
 
-	private void slowPathSet(MatrixView other) {
-		for (int r = 0; r < rows(); r++) for (int c = 0; c < columns(); c++) {
-			m[index(r, c)] = other.get(r, c);
-		}
+	default MMatrix asSymmetricCopy() {
+		assert exactEquals(transpose());
+
+		var result = Matrix.ofSymmetric(rows());
+		result.set(this);
+		return result;
 	}
 
 	@Override
-	public Matrix transpose() {
-		return of(m, layout.transpose());
+	default ArrayMatrix asArrayBacked() {
+		return (ArrayMatrix) GenericElement.super.asArrayBacked();
 	}
 
 	@Override
-	public Matrix asMatrix() {
-		return this;
+	default ArrayMatrix arrayBackedCopy() {
+		return arrayBackedCopy(MatrixLayout.ofOptimal(rows(), columns()));
+	}
+
+	/**
+	 * An array-backed copy of this matrix with the given layout
+	 * @return a copy
+	 */
+	default ArrayMatrix arrayBackedCopy(MatrixLayout layout) {
+		var result = Matrix.of(layout);
+		result.set(this);
+		return result;
 	}
 
 	@Override
-	public SymmetricMatrixView asSymmetricMatrix() {
-		return SymmetricMatrix.of(this);
+	default MMatrix copy() {
+		var result = Matrix.of(rows(), columns());
+		result.set(this);
+		return result;
 	}
 
 	@Override
-	public String toString() {
-		return MatrixView.toString(this);
+	default MMatrix move() {
+		return (MMatrix) GenericElement.super.move();
+	}
+
+	/**
+	 * Formats a matrix as a string
+	 * @param m the matrix to format
+	 * @return the string
+	 */
+	static String toString(Matrix m) {
+		StringBuilder output = new StringBuilder("[\n");
+
+		for (int r = 0; r < m.rows(); r++) {
+			for (int c = 0; c < m.columns(); c++) {
+				output.append(String.format("\t%+.2f", m.get(r, c)));
+			}
+
+			output.append('\n');
+		}
+
+		output.append(']');
+
+		return output.toString();
 	}
 }
