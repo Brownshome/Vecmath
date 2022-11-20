@@ -1,6 +1,6 @@
 package brownshome.vecmath.matrix;
 
-import brownshome.vecmath.*;
+import brownshome.vecmath.vector.*;
 
 public interface MatrixView {
 	/**
@@ -476,7 +476,7 @@ public interface MatrixView {
 
 	/**
 	 * Creates a matrix that represents the cross product of vec.
-	 *
+	 * <p>
 	 * cross(vec) * a = vec x a
 	 *
 	 * @param vec the vector to cross using
@@ -670,7 +670,7 @@ public interface MatrixView {
 
 	/**
 	 * Formats a matrix as a string
-	 * @param m the martix to format
+	 * @param m the matrix to format
 	 * @return the string
 	 */
 	static String toString(MatrixView m) {
