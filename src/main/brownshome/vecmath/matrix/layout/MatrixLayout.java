@@ -1,8 +1,9 @@
 package brownshome.vecmath.matrix.layout;
 
+import brownshome.vecmath.basic.layout.BasicMatrixLayout;
 import brownshome.vecmath.generic.ElementLayout;
 import brownshome.vecmath.matrix.basic.layout.*;
-import brownshome.vecmath.vector.basic.layout.MatrixVecNLayout;
+import brownshome.vecmath.matrix.wrapped.layout.WrappedMatrixLayout;
 import brownshome.vecmath.vector.layout.VecNLayout;
 
 /**
@@ -228,7 +229,7 @@ public interface MatrixLayout extends ElementLayout {
 	 * @return a vector layout
 	 */
 	default VecNLayout row(int r) {
-		return new MatrixVecNLayout(subLayout(r, 0, 1, columns()).transpose());
+		return new WrappedMatrixLayout(subLayout(r, 0, 1, columns()).transpose());
 	}
 
 	/**
@@ -237,6 +238,6 @@ public interface MatrixLayout extends ElementLayout {
 	 * @return a vector layout
 	 */
 	default VecNLayout column(int c) {
-		return new MatrixVecNLayout(subLayout(0, c, rows(), 1));
+		return new WrappedMatrixLayout(subLayout(0, c, rows(), 1));
 	}
 }

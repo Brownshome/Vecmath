@@ -2,8 +2,8 @@ package brownshome.vecmath.vector.array;
 
 import java.util.Arrays;
 
+import brownshome.vecmath.matrix.MMatrix;
 import brownshome.vecmath.vector.*;
-import brownshome.vecmath.vector.basic.array.BasicArrayVec3;
 import brownshome.vecmath.vector.layout.Vec3Layout;
 import brownshome.vecmath.vector.generic.GenericArrayVec;
 
@@ -73,7 +73,7 @@ public interface ArrayVec3 extends MVec3, GenericArrayVec<Vec3Layout, Vec3> {
 
 	@Override
 	default ArrayVecN asUnknownSize() {
-		return VecN.of(backingArray(), layout().asVecNLayout());
+		return GenericArrayVec.super.asUnknownSize();
 	}
 
 	@Override
@@ -90,6 +90,16 @@ public interface ArrayVec3 extends MVec3, GenericArrayVec<Vec3Layout, Vec3> {
 		}
 
 		return MVec3.super.arrayBackedCopy(layout);
+	}
+
+	@Override
+	default MMatrix asRow() {
+		return GenericArrayVec.super.asRow();
+	}
+
+	@Override
+	default MMatrix asColumn() {
+		return GenericArrayVec.super.asColumn();
 	}
 
 	@Override

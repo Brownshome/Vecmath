@@ -8,7 +8,7 @@ import brownshome.vecmath.vector.generic.GenericVec;
  *
  * @param <TARGET_VEC_TYPE> the vector type acted on by this rotation
  * @param <TARGET_MVEC_TYPE> the mutable vector type acted on by this rotation
- * @param <VEC_TYPE> the vector type acted on by this rotation
+ * @param <VEC_TYPE> the vector type of this rotation
  * @param <ROT_TYPE> the type of this rotation
  */
 @SuppressWarnings("unchecked")

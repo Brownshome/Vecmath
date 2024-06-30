@@ -1,5 +1,7 @@
 package brownshome.vecmath.vector.basic;
 
+import java.util.Objects;
+
 import brownshome.vecmath.rotation.MRot3;
 import brownshome.vecmath.vector.*;
 
@@ -55,5 +57,15 @@ public final class BasicVec4 extends BasicVec<Vec4> implements MRot3 {
 	@Override
 	public void w(double w){
 		this.w = w;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(x, y, z, w);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof Vec4 vec && exactEquals(vec);
 	}
 }

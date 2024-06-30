@@ -20,4 +20,9 @@ public final class BasicArrayVecN extends BasicArrayVec<VecNLayout, VecN> implem
 	public BasicArrayVecN copy() {
 		return new BasicArrayVecN(this);
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof VecN vec && vec.size() == size() && exactEquals(vec);
+	}
 }

@@ -2,12 +2,10 @@ package brownshome.vecmath.vector.array;
 
 import java.util.Arrays;
 
-import brownshome.vecmath.rotation.MRot2;
-import brownshome.vecmath.rotation.MRot3;
-import brownshome.vecmath.rotation.Rot2;
+import brownshome.vecmath.matrix.MMatrix;
 import brownshome.vecmath.rotation.Rot3;
+import brownshome.vecmath.rotation.array.ArrayRot3;
 import brownshome.vecmath.vector.*;
-import brownshome.vecmath.vector.basic.array.BasicArrayVec4;
 import brownshome.vecmath.vector.layout.Vec4Layout;
 import brownshome.vecmath.vector.generic.GenericArrayVec;
 
@@ -87,11 +85,11 @@ public interface ArrayVec4 extends MVec4, GenericArrayVec<Vec4Layout, Vec4> {
 
 	@Override
 	default ArrayVecN asUnknownSize() {
-		return VecN.of(backingArray(), layout().asVecNLayout());
+		return GenericArrayVec.super.asUnknownSize();
 	}
 
 	@Override
-	default MRot3 asRot() {
+	default ArrayRot3 asRot() {
 		return Rot3.of(backingArray(), layout());
 	}
 
@@ -109,6 +107,16 @@ public interface ArrayVec4 extends MVec4, GenericArrayVec<Vec4Layout, Vec4> {
 		}
 
 		return MVec4.super.arrayBackedCopy(layout);
+	}
+
+	@Override
+	default MMatrix asRow() {
+		return GenericArrayVec.super.asRow();
+	}
+
+	@Override
+	default MMatrix asColumn() {
+		return GenericArrayVec.super.asColumn();
 	}
 
 	@Override

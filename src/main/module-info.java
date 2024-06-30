@@ -12,9 +12,16 @@ module brownshome.vecmath {
 
 	exports brownshome.vecmath.rotation;
 	exports brownshome.vecmath.rotation.array;
+	exports brownshome.vecmath.rotation.layout;
 
 	exports brownshome.vecmath.matrix;
 	exports brownshome.vecmath.matrix.array;
 	exports brownshome.vecmath.matrix.layout;
 	exports brownshome.vecmath.matrix.factorisation;
+
+	exports brownshome.vecmath.complex;
+	exports brownshome.vecmath.complex.array;
+	exports brownshome.vecmath.complex.layout;
+	exports brownshome.vecmath.complex.basic.array;
+	exports brownshome.vecmath.complex.generic;
 }

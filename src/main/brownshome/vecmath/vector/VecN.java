@@ -1,9 +1,16 @@
 package brownshome.vecmath.vector;
 
+import java.util.NoSuchElementException;
+import java.util.PrimitiveIterator;
+import java.util.Spliterator;
+import java.util.Spliterators;
+
+import brownshome.vecmath.matrix.Matrix;
 import brownshome.vecmath.vector.array.*;
 import brownshome.vecmath.vector.basic.array.BasicArrayVecN;
 import brownshome.vecmath.vector.generic.GenericVec;
 import brownshome.vecmath.vector.layout.*;
+import brownshome.vecmath.vector.wrapped.VecNWrapper;
 
 /**
  * An arbitrary-element vector
@@ -71,6 +78,34 @@ public interface VecN extends GenericVec<VecN> {
 	double get(int i);
 
 	@Override
+	default PrimitiveIterator.OfDouble iterator() {
+		return new PrimitiveIterator.OfDouble() {
+			int i = 0;
+
+			@Override
+			public double nextDouble() {
+				if (!hasNext()) {
+					throw new NoSuchElementException();
+				}
+
+				i++;
+
+				return get(i);
+			}
+
+			@Override
+			public boolean hasNext() {
+				return i != size();
+			}
+		};
+	}
+
+	@Override
+	default Spliterator.OfDouble spliterator() {
+		return Spliterators.spliterator(iterator(), size(), Spliterator.ORDERED | Spliterator.SIZED | Spliterator.NONNULL | Spliterator.CONCURRENT | Spliterator.SUBSIZED);
+	}
+
+	@Override
 	default double dot(VecN other) {
 		assert size() == other.size();
 
@@ -84,6 +119,8 @@ public interface VecN extends GenericVec<VecN> {
 
 	@Override
 	default boolean exactEquals(VecN other) {
+		assert other.size() == size();
+
 		boolean equal = true;
 		for (int i = 0; i < size(); i++) {
 			equal &= get(i) == other.get(i);
@@ -98,38 +135,20 @@ public interface VecN extends GenericVec<VecN> {
 	}
 
 	/**
+	 * Returns this vector as a single value if it is one
+	 * @return the single value in this vector
+	 */
+	default double asValue() {
+		assert size() == 1;
+		return get(0);
+	}
+
+	/**
 	 * Returns a {@link Vec2} mirroring this vector. This method must only be called if {@link VecN#size()} is 2.
 	 * @return a {@link Vec2}
 	 */
 	default Vec2 asVec2() {
-		assert size() == 2;
-
-		return new Vec2() {
-			@Override
-			public double x() {
-				return get(0);
-			}
-
-			@Override
-			public double y() {
-				return get(1);
-			}
-
-			@Override
-			public ArrayVec2 asArrayBacked() {
-				return VecN.this.asArrayBacked().asVec2();
-			}
-
-			@Override
-			public ArrayVec2 arrayBackedCopy(Vec2Layout layout) {
-				return VecN.this.arrayBackedCopy(layout.asVecNLayout()).asVec2();
-			}
-
-			@Override
-			public String toString() {
-				return VecN.this.toString();
-			}
-		};
+		return new VecNWrapper.BasicToVec2(this);
 	}
 
 	/**
@@ -137,39 +156,7 @@ public interface VecN extends GenericVec<VecN> {
 	 * @return a {@link Vec3}
 	 */
 	default Vec3 asVec3() {
-		assert size() == 3;
-
-		return new Vec3() {
-			@Override
-			public double x() {
-				return get(0);
-			}
-
-			@Override
-			public double y() {
-				return get(1);
-			}
-
-			@Override
-			public double z() {
-				return get(2);
-			}
-
-			@Override
-			public ArrayVec3 asArrayBacked() {
-				return VecN.this.asArrayBacked().asVec3();
-			}
-
-			@Override
-			public ArrayVec3 arrayBackedCopy(Vec3Layout layout) {
-				return VecN.this.arrayBackedCopy(layout.asVecNLayout()).asVec3();
-			}
-
-			@Override
-			public String toString() {
-				return VecN.this.toString();
-			}
-		};
+		return new VecNWrapper.BasicToVec3(this);
 	}
 
 	/**
@@ -177,44 +164,17 @@ public interface VecN extends GenericVec<VecN> {
 	 * @return a {@link Vec4}
 	 */
 	default Vec4 asVec4() {
-		assert size() == 4;
+		return new VecNWrapper.BasicToVec4(this);
+	}
 
-		return new Vec4() {
-			@Override
-			public double x() {
-				return get(0);
-			}
+	@Override
+	default Matrix asRow() {
+		return asColumn().transpose();
+	}
 
-			@Override
-			public double y() {
-				return get(1);
-			}
-
-			@Override
-			public double z() {
-				return get(2);
-			}
-
-			@Override
-			public double w() {
-				return get(3);
-			}
-
-			@Override
-			public ArrayVec4 asArrayBacked() {
-				return VecN.this.asArrayBacked().asVec4();
-			}
-
-			@Override
-			public ArrayVec4 arrayBackedCopy(Vec4Layout layout) {
-				return VecN.this.arrayBackedCopy(layout.asVecNLayout()).asVec4();
-			}
-
-			@Override
-			public String toString() {
-				return VecN.this.toString();
-			}
-		};
+	@Override
+	default Matrix asColumn() {
+		return new VecNWrapper.BasicToMatrix(this);
 	}
 
 	@Override
@@ -241,12 +201,7 @@ public interface VecN extends GenericVec<VecN> {
 
 	@Override
 	default MVecN copy() {
-		double[] values = new double[size()];
-		for (int i = 0; i < size(); i++) {
-			values[i] = get(i);
-		}
-
-		return of(values);
+		return arrayBackedCopy();
 	}
 
 	@Override

@@ -4,12 +4,13 @@ import brownshome.vecmath.matrix.Matrix;
 import brownshome.vecmath.matrix.layout.MatrixLayout;
 import brownshome.vecmath.rotation.array.ArrayRot3;
 import brownshome.vecmath.rotation.generic.GenericRot;
+import brownshome.vecmath.rotation.layout.Rot3Layout;
 import brownshome.vecmath.vector.*;
 import brownshome.vecmath.vector.basic.array.BasicArrayVec4;
 import brownshome.vecmath.vector.basic.BasicVec4;
 import brownshome.vecmath.vector.layout.Vec4Layout;
 
-/** Represents a 3 dimensional rotation. Use this interface to represent a rotation that may be edited by the creator and no-one else. */
+/** Represents a 3-dimensional rotation. Use this interface to represent a rotation that may be edited by the creator and no-one else. */
 public interface Rot3 extends GenericRot<Vec3, MVec3, Vec4, Rot3>, Vec4 {
 	/**
 	 * A rotation of zero angle
@@ -102,11 +103,15 @@ public interface Rot3 extends GenericRot<Vec3, MVec3, Vec4, Rot3>, Vec4 {
 
 	@Override
 	default ArrayRot3 arrayBackedCopy() {
-		return (ArrayRot3) Vec4.super.arrayBackedCopy();
+		return arrayBackedCopy(Rot3Layout.ofOptimal());
 	}
 
-	@Override
-	default ArrayRot3 arrayBackedCopy(Vec4Layout layout) {
+	/**
+	 * Gets a copy of this rotation backed by an array with the given layout
+	 * @param layout the layout
+	 * @return an array-backed copy
+	 */
+	default ArrayRot3 arrayBackedCopy(Rot3Layout layout) {
 		return (ArrayRot3) Vec4.super.arrayBackedCopy(layout);
 	}
 

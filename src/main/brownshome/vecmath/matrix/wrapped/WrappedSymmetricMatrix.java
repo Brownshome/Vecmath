@@ -1,9 +1,11 @@
-package brownshome.vecmath.matrix.basic;
+package brownshome.vecmath.matrix.wrapped;
 
 import brownshome.vecmath.matrix.MMatrix;
 import brownshome.vecmath.matrix.Matrix;
 import brownshome.vecmath.matrix.MatrixWithFastMultiply;
 import brownshome.vecmath.matrix.array.ArrayMatrix;
+import brownshome.vecmath.matrix.basic.PermutationUtil;
+import brownshome.vecmath.matrix.basic.SymmetricMatrix;
 import brownshome.vecmath.matrix.factorisation.Factorisation;
 import brownshome.vecmath.matrix.layout.MatrixLayout;
 import brownshome.vecmath.vector.VecN;

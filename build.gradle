@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'brownshome'
-version = '4.0.0'
+version = '4.1.0'
 
 repositories {
 	mavenCentral()
@@ -20,7 +20,7 @@ javadoc {
 	options.encoding 'utf-8'
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
 	options.encoding = 'utf-8'
 }
 
@@ -44,7 +44,6 @@ publishing {
 			name = 'GitHubPackages'
 			url = uri('https://maven.pkg.github.com/Brownshome/Vecmath')
 			credentials {
-				println project.getProperties()
 				username = project.properties['gpr.usr']
 				password = project.properties['gpr.key']
 			}

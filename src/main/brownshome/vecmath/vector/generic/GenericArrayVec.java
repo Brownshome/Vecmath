@@ -1,6 +1,10 @@
 package brownshome.vecmath.vector.generic;
 
 import brownshome.vecmath.generic.GenericArrayElement;
+import brownshome.vecmath.matrix.MMatrix;
+import brownshome.vecmath.matrix.Matrix;
+import brownshome.vecmath.vector.VecN;
+import brownshome.vecmath.vector.array.ArrayVecN;
 
 /**
  * An internal interface defining many of the shared methods that can be implemented generically
@@ -24,5 +28,20 @@ public interface GenericArrayVec<
 		}
 
 		return sum;
+	}
+
+	@Override
+	default ArrayVecN asUnknownSize() {
+		return VecN.of(backingArray(), layout().asVecN());
+	}
+
+	@Override
+	default MMatrix asRow() {
+		return Matrix.of(backingArray(), layout().asRowMatrix());
+	}
+
+	@Override
+	default MMatrix asColumn() {
+		return Matrix.of(backingArray(), layout().asColumnMatrix());
 	}
 }

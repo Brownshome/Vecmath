@@ -1,8 +1,10 @@
 package brownshome.vecmath.vector.layout;
 
-import brownshome.vecmath.matrix.layout.MatrixLayout;
-import brownshome.vecmath.vector.basic.layout.BasicVec2Layout;
+import brownshome.vecmath.basic.layout.BasicColumnLayout;
+import brownshome.vecmath.complex.layout.ComplexLayout;
+import brownshome.vecmath.rotation.layout.Rot2Layout;
 import brownshome.vecmath.vector.generic.GenericVecLayout;
+import brownshome.vecmath.vector.wrapped.layout.WrappedVecLayout;
 
 /**
  * The layout of an array-backed 2-element vector
@@ -40,79 +42,22 @@ public interface Vec2Layout extends GenericVecLayout {
 	 * @return a layout
 	 */
 	static Vec2Layout of(int offset, int stride) {
-		return new BasicVec2Layout(offset, stride);
+		return new BasicColumnLayout(2, offset, stride);
 	}
 
 	/**
-	 * This layout as an arbitrary-length vector layout
-	 * @return a layout
+	 * Gets this vector layout as a complex number layout
+	 * @return a complex number layout
 	 */
-	default VecNLayout asVecNLayout() {
-		return new VecNLayout() {
-			@Override
-			public int start() {
-				return Vec2Layout.this.start();
-			}
-
-			@Override
-			public int end() {
-				return Vec2Layout.this.end();
-			}
-
-			@Override
-			public int size() {
-				return Vec2Layout.this.size();
-			}
-
-			@Override
-			public boolean isContinuous() {
-				return Vec2Layout.this.isContinuous();
-			}
-
-			@Override
-			public boolean isPacked() {
-				return Vec2Layout.this.isPacked();
-			}
-
-			@Override
-			public int arrayIndex(int index) {
-				return Vec2Layout.this.arrayIndex(index);
-			}
-
-			@Override
-			public int elements() {
-				return 2;
-			}
-
-			@Override
-			public Vec2Layout asVec2Layout() {
-				return Vec2Layout.this;
-			}
-
-			@Override
-			public Vec3Layout asVec3Layout() {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public Vec4Layout asVec4Layout() {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public String toString() {
-				return Vec2Layout.this.toString();
-			}
-		};
+	default ComplexLayout asComplex() {
+		return new WrappedVecLayout(this);
 	}
 
-	@Override
-	default MatrixLayout asRowMatrix() {
-		return asVecNLayout().asRowMatrix();
-	}
-
-	@Override
-	default MatrixLayout asColumnMatrix() {
-		return asVecNLayout().asColumnMatrix();
+	/**
+	 * Gets this vector layout as a rotation layout
+	 * @return a rotation layout
+	 */
+	default Rot2Layout asRot2() {
+		return new WrappedVecLayout(this);
 	}
 }

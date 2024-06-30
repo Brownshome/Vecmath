@@ -1,7 +1,7 @@
 package brownshome.vecmath.vector.basic.array;
 
-import brownshome.vecmath.matrix.MMatrix;
-import brownshome.vecmath.matrix.Matrix;
+import java.util.Arrays;
+
 import brownshome.vecmath.vector.generic.GenericArrayVec;
 import brownshome.vecmath.vector.basic.BasicVec;
 import brownshome.vecmath.vector.generic.GenericVec;
@@ -35,21 +35,8 @@ abstract class BasicArrayVec<
 		return array;
 	}
 
-	public final double get(int i) {
-		return array[layout.arrayIndex(i)];
-	}
-
-	public final void set(double value, int i) {
-		array[layout.arrayIndex(i)] = value;
-	}
-
 	@Override
-	public MMatrix asRow() {
-		return Matrix.of(array, layout.asRowMatrix());
-	}
-
-	@Override
-	public MMatrix asColumn() {
-		return Matrix.of(array, layout.asColumnMatrix());
+	public int hashCode() {
+		return Arrays.hashCode(values().toArray());
 	}
 }

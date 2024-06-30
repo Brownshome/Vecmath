@@ -65,6 +65,17 @@ public interface GenericArrayElement<
 	}
 
 	@Override
+	default void scaleAddToSelf(ELEMENT_TYPE e, double scale) {
+		var cast = (GenericArrayElement<LAYOUT_TYPE, ELEMENT_TYPE>) e;
+		assert layout().isContinuous();
+		assert cast.layout().equals(layout());
+
+		for (int i = layout().start(), j = cast.layout().start(); i < layout().end(); i++, j++) {
+			backingArray()[i] += cast.backingArray()[j] * scale;
+		}
+	}
+
+	@Override
 	default boolean exactEquals(ELEMENT_TYPE other) {
 		var cast = (GenericArrayElement<LAYOUT_TYPE, ELEMENT_TYPE>) other;
 		assert layout().isContinuous();

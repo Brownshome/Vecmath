@@ -15,7 +15,7 @@ final class Rot2Test {
 	@Test
 	void angle() {
 		assertEquals(Math.toRadians(20.0), A.angle(), ACCURACY);
-		assertEquals(Math.toRadians(120.0), B.angle(), ACCURACY);
+		assertEquals(Math.toRadians(-120.0), B.angle(), ACCURACY);
 	}
 
 	@Test

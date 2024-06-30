@@ -58,7 +58,7 @@ public interface GenericRot<
 	}
 
 	/**
-	 * The angle of this rotation in the range [0, pi]
+	 * The angle of this rotation in the range [-π, π]
 	 * @return an angle in radians
 	 */
 	double angle();

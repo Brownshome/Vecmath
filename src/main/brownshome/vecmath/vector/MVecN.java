@@ -1,9 +1,8 @@
 package brownshome.vecmath.vector;
 
-import brownshome.vecmath.vector.array.ArrayVec2;
-import brownshome.vecmath.vector.array.ArrayVec3;
-import brownshome.vecmath.vector.array.ArrayVec4;
+import brownshome.vecmath.matrix.MMatrix;
 import brownshome.vecmath.vector.generic.GenericMVec;
+import brownshome.vecmath.vector.wrapped.MVecNWrapper;
 
 /**
  * A mutable arbitrary-element vector
@@ -73,158 +72,27 @@ public interface MVecN extends GenericMVec<VecN>, VecN {
 
 	@Override
 	default MVec2 asVec2() {
-		assert size() == 2;
-
-		return new MVec2() {
-			@Override
-			public void x(double x) {
-				MVecN.this.set(x, 0);
-			}
-
-			@Override
-			public void y(double y) {
-				MVecN.this.set(y, 1);
-			}
-
-			@Override
-			public double x() {
-				return get(0);
-			}
-
-			@Override
-			public double y() {
-				return get(1);
-			}
-
-			@Override
-			public MVecN asUnknownSize() {
-				return MVecN.this;
-			}
-
-			@Override
-			public ArrayVec2 asArrayBacked() {
-				return MVecN.this.asArrayBacked().asVec2();
-			}
-
-			@Override
-			public String toString() {
-				return MVecN.this.toString();
-			}
-		};
+		return new MVecNWrapper.BasicToVec2(this);
 	}
 
 	@Override
 	default MVec3 asVec3() {
-		assert size() == 3;
-
-		return new MVec3() {
-			@Override
-			public void x(double x) {
-				MVecN.this.set(x, 0);
-			}
-
-			@Override
-			public void y(double y) {
-				MVecN.this.set(y, 1);
-			}
-
-			@Override
-			public void z(double z) {
-				MVecN.this.set(z, 2);
-			}
-
-			@Override
-			public double x() {
-				return get(0);
-			}
-
-			@Override
-			public double y() {
-				return get(1);
-			}
-
-			@Override
-			public double z() {
-				return get(2);
-			}
-
-			@Override
-			public MVecN asUnknownSize() {
-				return MVecN.this;
-			}
-
-			@Override
-			public ArrayVec3 asArrayBacked() {
-				return MVecN.this.asArrayBacked().asVec3();
-			}
-
-			@Override
-			public String toString() {
-				return MVecN.this.toString();
-			}
-		};
+		return new MVecNWrapper.BasicToVec3(this);
 	}
 
 	@Override
 	default MVec4 asVec4() {
-		assert size() == 4;
+		return new MVecNWrapper.BasicToVec4(this);
+	}
 
-		return new MVec4() {
-			@Override
-			public void x(double x) {
-				MVecN.this.set(x, 0);
-			}
+	@Override
+	default MMatrix asRow() {
+		return (MMatrix) VecN.super.asRow();
+	}
 
-			@Override
-			public void y(double y) {
-				MVecN.this.set(y, 1);
-			}
-
-			@Override
-			public void z(double z) {
-				MVecN.this.set(z, 2);
-			}
-
-			@Override
-			public void w(double w) {
-				MVecN.this.set(w, 3);
-			}
-
-			@Override
-			public double x() {
-				return get(0);
-			}
-
-			@Override
-			public double y() {
-				return get(1);
-			}
-
-			@Override
-			public double z() {
-				return get(2);
-			}
-
-			@Override
-			public double w() {
-				return get(3);
-			}
-
-			@Override
-			public MVecN asUnknownSize() {
-				return MVecN.this;
-			}
-
-			@Override
-			public ArrayVec4 asArrayBacked() {
-				return MVecN.this.asArrayBacked().asVec4();
-			}
-
-			@Override
-			public String toString() {
-				return MVecN.this.toString();
-			}
-		};
+	@Override
+	default MMatrix asColumn() {
+		return new MVecNWrapper.BasicToMatrix(this);
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package brownshome.vecmath.vector.basic;
 
+import java.util.Objects;
+
 import brownshome.vecmath.rotation.MRot2;
 import brownshome.vecmath.vector.Vec2;
 
@@ -19,7 +21,7 @@ public final class BasicVec2 extends BasicVec<Vec2> implements MRot2 {
 	public double x() {
 		return x;
 	}
-	
+
 	@Override
 	public double y() {
 		return y;
@@ -29,9 +31,19 @@ public final class BasicVec2 extends BasicVec<Vec2> implements MRot2 {
 	public void x(double x) {
 		this.x = x;
 	}
-	
+
 	@Override
 	public void y(double y) {
 		this.y = y;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(x, y);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof Vec2 vec && exactEquals(vec);
 	}
 }

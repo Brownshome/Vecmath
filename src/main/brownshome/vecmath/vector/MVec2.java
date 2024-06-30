@@ -1,11 +1,10 @@
 package brownshome.vecmath.vector;
 
-import brownshome.vecmath.generic.GenericMElement;
+import brownshome.vecmath.complex.MComplex;
+import brownshome.vecmath.matrix.MMatrix;
 import brownshome.vecmath.rotation.MRot2;
-import brownshome.vecmath.rotation.Rot2;
-import brownshome.vecmath.vector.array.ArrayVec2;
-import brownshome.vecmath.vector.array.ArrayVecN;
 import brownshome.vecmath.vector.generic.GenericMVec;
+import brownshome.vecmath.vector.wrapped.MVec2Wrapper;
 
 /**
  * A mutable 2-element vector
@@ -71,45 +70,7 @@ public interface MVec2 extends GenericMVec<Vec2>, Vec2 {
 
 	@Override
 	default MVecN asUnknownSize() {
-		return new MVecN() {
-			@Override
-			public int size() {
-				return 2;
-			}
-
-			@Override
-			public double get(int i) {
-				assert i < size();
-
-				return i == 0 ? x() : y();
-			}
-
-			@Override
-			public void set(double value, int index) {
-				assert index < size();
-
-				if (index == 0) {
-					x(value);
-				} else {
-					y(value);
-				}
-			}
-
-			@Override
-			public MVec2 asVec2() {
-				return MVec2.this;
-			}
-
-			@Override
-			public ArrayVecN asArrayBacked() {
-				return MVec2.this.asArrayBacked().asUnknownSize();
-			}
-
-			@Override
-			public String toString() {
-				return MVec2.this.toString();
-			}
-		};
+		return new MVec2Wrapper.BasicToVecN(this);
 	}
 
 	/**
@@ -118,27 +79,22 @@ public interface MVec2 extends GenericMVec<Vec2>, Vec2 {
 	 */
 	@Override
 	default MRot2 asRot() {
-		return new MRot2() {
-			@Override
-			public void x(double x) {
-				MVec2.this.x(x);
-			}
+		return new MVec2Wrapper.BasicToRot2(this);
+	}
 
-			@Override
-			public void y(double y) {
-				MVec2.this.y(y);
-			}
+	@Override
+	default MComplex asComplex() {
+		return new MVec2Wrapper.BasicToComplex(this);
+	}
 
-			@Override
-			public double x() {
-				return MVec2.this.x();
-			}
+	@Override
+	default MMatrix asRow() {
+		return (MMatrix) Vec2.super.asRow();
+	}
 
-			@Override
-			public double y() {
-				return MVec2.this.y();
-			}
-		};
+	@Override
+	default MMatrix asColumn() {
+		return new MVec2Wrapper.BasicToMatrix(this);
 	}
 
 	@Override

@@ -2,8 +2,8 @@ package brownshome.vecmath.vector.array;
 
 import java.util.Arrays;
 
+import brownshome.vecmath.matrix.MMatrix;
 import brownshome.vecmath.vector.*;
-import brownshome.vecmath.vector.basic.layout.WrappedVecLayout;
 import brownshome.vecmath.vector.layout.VecNLayout;
 import brownshome.vecmath.vector.generic.GenericArrayVec;
 
@@ -23,6 +23,11 @@ public interface ArrayVecN extends MVecN, GenericArrayVec<VecNLayout, VecN> {
 
 	@Override
 	default void set(VecN vec) {
+		if (vec instanceof ArrayVecN arrayVec && layout().isContinuous() && arrayVec.layout().equals(layout())) {
+			GenericArrayVec.super.set(vec);
+			return;
+		}
+
 		MVecN.super.set(vec);
 	}
 
@@ -33,26 +38,49 @@ public interface ArrayVecN extends MVecN, GenericArrayVec<VecNLayout, VecN> {
 
 	@Override
 	default void addToSelf(VecN vec) {
+		if (vec instanceof ArrayVecN arrayVecN && layout().isContinuous() && arrayVecN.layout().equals(layout())) {
+			GenericArrayVec.super.addToSelf(vec);
+			return;
+		}
+
 		MVecN.super.addToSelf(vec);
 	}
 
 	@Override
 	default void scaleSelf(double scale) {
+		if (layout().isContinuous()) {
+			GenericArrayVec.super.scaleSelf(scale);
+			return;
+		}
+
 		MVecN.super.scaleSelf(scale);
 	}
 
 	@Override
 	default void scaleSelf(VecN scale) {
-		MVecN.super.scaleSelf(scale);
+		if (scale instanceof ArrayVecN arrayVecN && layout().isContinuous() && arrayVecN.layout().equals(layout())) {
+			GenericArrayVec.super.scaleSelf(scale);
+			return;
+		}
+
+		MVecN.super.addToSelf(scale);
 	}
 
 	@Override
 	default double dot(VecN vec) {
+		if (vec instanceof ArrayVecN arrayVecN && layout().isContinuous() && arrayVecN.layout().equals(layout())) {
+			return GenericArrayVec.super.dot(vec);
+		}
+
 		return MVecN.super.dot(vec);
 	}
 
 	@Override
 	default boolean exactEquals(VecN other) {
+		if (other instanceof ArrayVecN arrayVecN && layout().isContinuous() && arrayVecN.layout().equals(layout())) {
+			return GenericArrayVec.super.exactEquals(other);
+		}
+
 		return MVecN.super.exactEquals(other);
 	}
 
@@ -68,23 +96,17 @@ public interface ArrayVecN extends MVecN, GenericArrayVec<VecNLayout, VecN> {
 
 	@Override
 	default ArrayVec2 asVec2() {
-		assert size() == 2;
-
-		return Vec2.of(backingArray(), new WrappedVecLayout(layout()));
+		return Vec2.of(backingArray(), layout().asVec2());
 	}
 
 	@Override
 	default ArrayVec3 asVec3() {
-		assert size() == 3;
-
-		return Vec3.of(backingArray(), new WrappedVecLayout(layout()));
+		return Vec3.of(backingArray(), layout().asVec3());
 	}
 
 	@Override
 	default ArrayVec4 asVec4() {
-		assert size() == 4;
-
-		return Vec4.of(backingArray(), new WrappedVecLayout(layout()));
+		return Vec4.of(backingArray(), layout().asVec4());
 	}
 
 	@Override
@@ -96,6 +118,16 @@ public interface ArrayVecN extends MVecN, GenericArrayVec<VecNLayout, VecN> {
 		}
 
 		return MVecN.super.arrayBackedCopy(layout);
+	}
+
+	@Override
+	default MMatrix asRow() {
+		return GenericArrayVec.super.asRow();
+	}
+
+	@Override
+	default MMatrix asColumn() {
+		return GenericArrayVec.super.asColumn();
 	}
 
 	@Override

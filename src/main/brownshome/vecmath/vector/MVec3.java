@@ -1,7 +1,8 @@
 package brownshome.vecmath.vector;
 
-import brownshome.vecmath.vector.array.ArrayVecN;
+import brownshome.vecmath.matrix.MMatrix;
 import brownshome.vecmath.vector.generic.GenericMVec;
+import brownshome.vecmath.vector.wrapped.MVec3Wrapper;
 
 /**
  * A mutable 3-element vector
@@ -89,49 +90,17 @@ public interface MVec3 extends GenericMVec<Vec3>, Vec3 {
 
 	@Override
 	default MVecN asUnknownSize() {
-		return new MVecN() {
-			@Override
-			public int size() {
-				return 3;
-			}
+		return new MVec3Wrapper.BasicToVecN(this);
+	}
 
-			@Override
-			public double get(int i) {
-				assert i < size();
+	@Override
+	default MMatrix asRow() {
+		return (MMatrix) Vec3.super.asRow();
+	}
 
-				return switch (i) {
-					case 0 -> x();
-					case 1 -> y();
-					default -> z();
-				};
-			}
-
-			@Override
-			public void set(double value, int index) {
-				assert index < size();
-
-				switch (index) {
-					case 0 -> x(value);
-					case 1 -> y(value);
-					default -> z(value);
-				}
-			}
-
-			@Override
-			public MVec3 asVec3() {
-				return MVec3.this;
-			}
-
-			@Override
-			public ArrayVecN asArrayBacked() {
-				return MVec3.this.asArrayBacked().asUnknownSize();
-			}
-
-			@Override
-			public String toString() {
-				return MVec3.this.toString();
-			}
-		};
+	@Override
+	default MMatrix asColumn() {
+		return new MVec3Wrapper.BasicToMatrix(this);
 	}
 
 	@Override

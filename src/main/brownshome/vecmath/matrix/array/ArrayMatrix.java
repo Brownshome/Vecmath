@@ -124,6 +124,18 @@ public interface ArrayMatrix extends GenericArrayElement<MatrixLayout, Matrix>, 
 	}
 
 	@Override
+	default void scaleAddToSelf(Matrix add, double scale) {
+		assert add != null;
+
+		if (layout().isContinuous() && add instanceof ArrayMatrix a && a.layout().equals(layout())) {
+			GenericArrayElement.super.scaleAddToSelf(add, scale);
+			return;
+		}
+
+		MMatrix.super.scaleAddToSelf(add, scale);
+	}
+
+	@Override
 	default boolean exactEquals(Matrix other) {
 		assert other != null;
 

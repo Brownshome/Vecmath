@@ -1,5 +1,8 @@
 package brownshome.vecmath.vector.basic.array;
 
+import brownshome.vecmath.complex.Complex;
+import brownshome.vecmath.complex.array.ArrayComplex;
+import brownshome.vecmath.rotation.Rot2;
 import brownshome.vecmath.rotation.array.ArrayRot2;
 import brownshome.vecmath.vector.Vec2;
 import brownshome.vecmath.vector.layout.Vec2Layout;
@@ -14,27 +17,27 @@ public final class BasicArrayVec2 extends BasicArrayVec<Vec2Layout, Vec2> implem
 	}
 
 	@Override
-	public double x() {
-		return get(0);
+	public ArrayComplex asComplex() {
+		return Complex.of(backingArray(), layout().asComplex());
 	}
 
 	@Override
-	public double y() {
-		return get(1);
-	}
-
-	@Override
-	public void x(double x) {
-		set(x, 0);
-	}
-
-	@Override
-	public void y(double y) {
-		set(y, 1);
+	public ArrayRot2 asRot() {
+		return Rot2.of(backingArray(), layout().asRot2());
 	}
 
 	@Override
 	public BasicArrayVec2 copy() {
 		return new BasicArrayVec2(this);
+	}
+
+	@Override
+	public BasicArrayVec2 move() {
+		return (BasicArrayVec2) ArrayRot2.super.move();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof Vec2 vec && exactEquals(vec);
 	}
 }

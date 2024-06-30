@@ -1,5 +1,7 @@
 package brownshome.vecmath.vector.basic;
 
+import java.util.Objects;
+
 import brownshome.vecmath.vector.MVec3;
 import brownshome.vecmath.vector.Vec3;
 
@@ -44,5 +46,15 @@ public final class BasicVec3 extends BasicVec<Vec3> implements MVec3 {
 	@Override
 	public void z(double z) {
 		this.z = z;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(x, y, z);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof Vec3 vec && exactEquals(vec);
 	}
 }

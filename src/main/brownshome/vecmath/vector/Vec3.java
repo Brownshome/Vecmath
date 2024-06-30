@@ -1,11 +1,17 @@
 package brownshome.vecmath.vector;
 
+import java.util.NoSuchElementException;
+import java.util.PrimitiveIterator;
+import java.util.Spliterator;
+import java.util.Spliterators;
+
+import brownshome.vecmath.matrix.Matrix;
 import brownshome.vecmath.vector.array.ArrayVec3;
-import brownshome.vecmath.vector.array.ArrayVecN;
 import brownshome.vecmath.vector.basic.BasicVec3;
 import brownshome.vecmath.vector.basic.array.BasicArrayVec3;
 import brownshome.vecmath.vector.generic.GenericVec;
 import brownshome.vecmath.vector.layout.Vec3Layout;
+import brownshome.vecmath.vector.wrapped.Vec3Wrapper;
 
 /**
  * A 3-element vector
@@ -72,7 +78,43 @@ public interface Vec3 extends GenericVec<Vec3> {
 	double x();
 	double y();
 	double z();
-	
+
+	@Override
+	default PrimitiveIterator.OfDouble iterator() {
+		return new PrimitiveIterator.OfDouble() {
+			int i = 0;
+
+			@Override
+			public double nextDouble() {
+				return switch (i) {
+					case 0 -> {
+						i++;
+						yield x();
+					}
+					case 1 -> {
+						i++;
+						yield y();
+					}
+					case 2 -> {
+						i++;
+						yield z();
+					}
+					default -> throw new NoSuchElementException();
+				};
+			}
+
+			@Override
+			public boolean hasNext() {
+				return i != 3;
+			}
+		};
+	}
+
+	@Override
+	default Spliterator.OfDouble spliterator() {
+		return Spliterators.spliterator(iterator(), 3, Spliterator.ORDERED | Spliterator.SIZED | Spliterator.NONNULL | Spliterator.CONCURRENT | Spliterator.SUBSIZED);
+	}
+
 	@Override
 	default double dot(Vec3 vec) {
  		return vec.x() * x() + vec.y() * y() + vec.z() * z();
@@ -96,43 +138,22 @@ public interface Vec3 extends GenericVec<Vec3> {
 
 	@Override
 	default VecN asUnknownSize() {
-		return new VecN() {
-			@Override
-			public int size() {
-				return 3;
-			}
-
-			@Override
-			public double get(int i) {
-				assert i < size();
-
-				return switch (i) {
-					case 0 -> x();
-					case 1 -> y();
-					default -> z();
-				};
-			}
-
-			@Override
-			public Vec3 asVec3() {
-				return Vec3.this;
-			}
-
-			@Override
-			public ArrayVecN asArrayBacked() {
-				return Vec3.this.asArrayBacked().asUnknownSize();
-			}
-
-			@Override
-			public String toString() {
-				return Vec3.this.toString();
-			}
-		};
+		return new Vec3Wrapper.BasicToVecN(this);
 	}
 
 	@Override
 	default ArrayVec3 asArrayBacked() {
 		return (ArrayVec3) GenericVec.super.asArrayBacked();
+	}
+
+	@Override
+	default Matrix asRow() {
+		return asColumn().transpose();
+	}
+
+	@Override
+	default Matrix asColumn() {
+		return new Vec3Wrapper.BasicToMatrix(this);
 	}
 
 	@Override

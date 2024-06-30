@@ -6,8 +6,8 @@ import brownshome.vecmath.vector.layout.Vec4Layout;
 
 public interface ArrayRot3 extends MRot3, ArrayVec4 {
 	@Override
-	default MRot3 asRot() {
-		return MRot3.super.asRot();
+	default ArrayRot3 asRot() {
+		return (ArrayRot3) MRot3.super.asRot();
 	}
 
 	@Override

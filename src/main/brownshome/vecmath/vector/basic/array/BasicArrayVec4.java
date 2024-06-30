@@ -14,47 +14,12 @@ public final class BasicArrayVec4 extends BasicArrayVec<Vec4Layout, Vec4> implem
 	}
 
 	@Override
-	public double x() {
-		return get(0);
-	}
-
-	@Override
-	public double y() {
-		return get(1);
-	}
-
-	@Override
-	public double z() {
-		return get(2);
-	}
-
-	@Override
-	public double w() {
-		return get(3);
-	}
-
-	@Override
-	public void x(double x) {
-		set(x, 0);
-	}
-
-	@Override
-	public void y(double y) {
-		set(y, 1);
-	}
-
-	@Override
-	public void z(double z) {
-		set(z, 2);
-	}
-
-	@Override
-	public void w(double w) {
-		set(w, 3);
-	}
-
-	@Override
 	public BasicArrayVec4 copy() {
 		return new BasicArrayVec4(this);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof Vec4 vec && exactEquals(vec);
 	}
 }

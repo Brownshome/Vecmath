@@ -10,6 +10,7 @@ import brownshome.vecmath.matrix.layout.MatrixLayout;
 public record EmptyMatrixLayout(int rows, int columns) implements MatrixLayout {
 	public EmptyMatrixLayout {
 		assert rows == 0 || columns == 0;
+		assert rows >= 0 && columns >= 0;
 	}
 
 	@Override
@@ -54,6 +55,6 @@ public record EmptyMatrixLayout(int rows, int columns) implements MatrixLayout {
 
 	@Override
 	public MatrixLayout transpose() {
-		return this;
+		return new EmptyMatrixLayout(columns, rows);
 	}
 }

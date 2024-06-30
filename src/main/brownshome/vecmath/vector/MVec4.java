@@ -1,9 +1,9 @@
 package brownshome.vecmath.vector;
 
+import brownshome.vecmath.matrix.MMatrix;
 import brownshome.vecmath.rotation.MRot3;
-import brownshome.vecmath.rotation.Rot3;
-import brownshome.vecmath.vector.array.ArrayVecN;
 import brownshome.vecmath.vector.generic.GenericMVec;
+import brownshome.vecmath.vector.wrapped.MVec4Wrapper;
 
 /**
  * A mutable 4-element vector
@@ -80,96 +80,22 @@ public interface MVec4 extends GenericMVec<Vec4>, Vec4 {
 
 	@Override
 	default MVecN asUnknownSize() {
-		return new MVecN() {
-			@Override
-			public int size() {
-				return 4;
-			}
-
-			@Override
-			public double get(int i) {
-				assert i < size();
-
-				return switch (i) {
-					case 0 -> x();
-					case 1 -> y();
-					case 2 -> z();
-					default -> w();
-				};
-			}
-
-			@Override
-			public void set(double value, int index) {
-				assert index < size();
-
-				switch (index) {
-					case 0 -> x(value);
-					case 1 -> y(value);
-					case 2 -> z(value);
-					default -> w(value);
-				}
-			}
-
-			@Override
-			public MVec4 asVec4() {
-				return MVec4.this;
-			}
-
-			@Override
-			public ArrayVecN asArrayBacked() {
-				return MVec4.this.asArrayBacked().asUnknownSize();
-			}
-
-			@Override
-			public String toString() {
-				return MVec4.this.toString();
-			}
-		};
+		return new MVec4Wrapper.BasicToVecN(this);
 	}
 
 	@Override
 	default MRot3 asRot() {
-		return new MRot3() {
-			@Override
-			public void x(double x) {
-				MVec4.this.x(x);
-			}
+		return new MVec4Wrapper.BasicToRot3(this);
+	}
 
-			@Override
-			public void y(double y) {
-				MVec4.this.y(y);
-			}
+	@Override
+	default MMatrix asRow() {
+		return (MMatrix) Vec4.super.asRow();
+	}
 
-			@Override
-			public void z(double z) {
-				MVec4.this.z(z);
-			}
-
-			@Override
-			public void w(double w) {
-				MVec4.this.w(w);
-			}
-
-			@Override
-			public double x() {
-				return MVec4.this.x();
-			}
-
-			@Override
-			public double y() {
-				return MVec4.this.y();
-			}
-
-			@Override
-			public double z() {
-				return MVec4.this.z();
-			}
-
-			@Override
-			public double w() {
-				return MVec4.this.w();
-			}
-		};
+	@Override
+	default MMatrix asColumn() {
+		return new MVec4Wrapper.BasicToMatrix(this);
 	}
 
 	@Override

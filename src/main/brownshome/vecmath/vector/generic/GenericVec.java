@@ -1,8 +1,12 @@
 package brownshome.vecmath.vector.generic;
 
+import java.util.PrimitiveIterator;
+import java.util.Spliterator;
+import java.util.stream.DoubleStream;
+import java.util.stream.StreamSupport;
+
 import brownshome.vecmath.generic.GenericElement;
 import brownshome.vecmath.matrix.Matrix;
-import brownshome.vecmath.matrix.basic.VecNMatrix;
 import brownshome.vecmath.vector.VecN;
 
 /**
@@ -11,7 +15,21 @@ import brownshome.vecmath.vector.VecN;
  * @param <VEC_TYPE> the type of this vector
  */
 @SuppressWarnings("unchecked")
-public interface GenericVec<VEC_TYPE extends GenericVec<VEC_TYPE>> extends GenericElement<VEC_TYPE> {
+public interface GenericVec<VEC_TYPE extends GenericVec<VEC_TYPE>> extends GenericElement<VEC_TYPE>, Iterable<Double> {
+	@Override
+	PrimitiveIterator.OfDouble iterator();
+
+	@Override
+	Spliterator.OfDouble spliterator();
+
+	/**
+	 * Gets a stream of values
+	 * @return a stream
+	 */
+	default DoubleStream values() {
+		return StreamSupport.doubleStream(spliterator(), false);
+	}
+
 	/**
 	 * The normalised vector in the same direction as this vector. The behaviour of this method is undefined if this vector
 	 * is the zero vector.
@@ -85,7 +103,7 @@ public interface GenericVec<VEC_TYPE extends GenericVec<VEC_TYPE>> extends Gener
 	 * @return a matrix
 	 */
 	default Matrix asRow() {
-		return new VecNMatrix(asUnknownSize()).transpose();
+		return asUnknownSize().asRow();
 	}
 
 	/**
@@ -93,6 +111,6 @@ public interface GenericVec<VEC_TYPE extends GenericVec<VEC_TYPE>> extends Gener
 	 * @return a matrix
 	 */
 	default Matrix asColumn() {
-		return new VecNMatrix(asUnknownSize());
+		return asUnknownSize().asColumn();
 	}
 }

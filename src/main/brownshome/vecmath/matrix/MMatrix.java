@@ -1,6 +1,8 @@
 package brownshome.vecmath.matrix;
 
 import brownshome.vecmath.generic.GenericMElement;
+import brownshome.vecmath.matrix.wrapped.WrappedMMatrix;
+import brownshome.vecmath.matrix.wrapped.WrappedMatrix;
 import brownshome.vecmath.vector.MVecN;
 
 /**
@@ -37,7 +39,7 @@ public interface MMatrix extends GenericMElement<Matrix>, Matrix {
 
 	@Override
 	default MVecN column(int c) {
-		return (MVecN) Matrix.super.column(c);
+		return new WrappedMMatrix.BasicToVecN(this, c);
 	}
 
 	@Override
@@ -111,6 +113,11 @@ public interface MMatrix extends GenericMElement<Matrix>, Matrix {
 		for (int r = 0; r < rows(); r++) for (int c = 0; c < columns(); c++) {
 			set(get(r, c) * matrix.get(r, c), r, c);
 		}
+	}
+
+	@Override
+	default void scaleAddToSelf(Matrix e, double scale) {
+		GenericMElement.super.scaleAddToSelf(e, scale);
 	}
 
 	/**

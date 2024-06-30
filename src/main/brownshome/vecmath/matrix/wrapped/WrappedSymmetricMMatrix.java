@@ -1,7 +1,8 @@
-package brownshome.vecmath.matrix.basic;
+package brownshome.vecmath.matrix.wrapped;
 
 import brownshome.vecmath.matrix.MMatrix;
 import brownshome.vecmath.matrix.Matrix;
+import brownshome.vecmath.matrix.basic.SymmetricMMatrix;
 import brownshome.vecmath.vector.MVecN;
 
 public final class WrappedSymmetricMMatrix extends WrappedSymmetricMatrix implements SymmetricMMatrix {

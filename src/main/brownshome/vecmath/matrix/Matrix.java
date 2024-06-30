@@ -6,8 +6,9 @@ import brownshome.vecmath.matrix.basic.*;
 import brownshome.vecmath.matrix.factorisation.Factorisation;
 import brownshome.vecmath.matrix.factorisation.basic.LowerUpperFactorisation;
 import brownshome.vecmath.matrix.layout.MatrixLayout;
+import brownshome.vecmath.matrix.wrapped.WrappedMatrix;
+import brownshome.vecmath.matrix.wrapped.WrappedSymmetricMatrix;
 import brownshome.vecmath.vector.*;
-import brownshome.vecmath.vector.basic.MatrixVecN;
 
 /**
  * A matrix
@@ -229,7 +230,7 @@ public interface Matrix extends GenericElement<Matrix> {
 	 * @return a vector of unknown size
 	 */
 	default VecN column(int c) {
-		return new MatrixVecN(this, c);
+		return new WrappedMatrix.BasicToVecN(this, c);
 	}
 
 	/**

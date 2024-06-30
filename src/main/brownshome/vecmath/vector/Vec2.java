@@ -1,15 +1,22 @@
 package brownshome.vecmath.vector;
 
+import java.util.NoSuchElementException;
+import java.util.PrimitiveIterator;
+import java.util.Spliterator;
+import java.util.Spliterators;
+
+import brownshome.vecmath.complex.Complex;
+import brownshome.vecmath.matrix.Matrix;
 import brownshome.vecmath.rotation.Rot2;
 import brownshome.vecmath.vector.array.ArrayVec2;
-import brownshome.vecmath.vector.array.ArrayVecN;
 import brownshome.vecmath.vector.basic.array.BasicArrayVec2;
 import brownshome.vecmath.vector.layout.Vec2Layout;
 import brownshome.vecmath.vector.basic.BasicVec2;
 import brownshome.vecmath.vector.generic.GenericVec;
+import brownshome.vecmath.vector.wrapped.Vec2Wrapper;
 
 /**
- * A 3-element vector
+ * A 2-element vector
  */
 public interface Vec2 extends GenericVec<Vec2> {
 	/**
@@ -64,8 +71,49 @@ public interface Vec2 extends GenericVec<Vec2> {
 		return new BasicArrayVec2(array, layout);
 	}
 
+	/**
+	 * The x-component of this vector
+	 * @return x
+	 */
 	double x();
+
+	/**
+	 * The y-component of this vector
+	 * @return y
+	 */
 	double y();
+
+	@Override
+	default Spliterator.OfDouble spliterator() {
+		return Spliterators.spliterator(iterator(), 2, Spliterator.ORDERED | Spliterator.SIZED | Spliterator.NONNULL | Spliterator.CONCURRENT | Spliterator.SUBSIZED);
+	}
+
+	@Override
+	default PrimitiveIterator.OfDouble iterator() {
+		return new PrimitiveIterator.OfDouble() {
+			int i = 0;
+
+			@Override
+			public double nextDouble() {
+				return switch (i) {
+					case 0 -> {
+						i++;
+						yield x();
+					}
+					case 1 -> {
+						i++;
+						yield y();
+					}
+					default -> throw new NoSuchElementException();
+				};
+			}
+
+			@Override
+			public boolean hasNext() {
+				return i != 2;
+			}
+		};
+	}
 
 	/**
 	 * A vector that is tangential to this vector. This function rotates the vector counterclockwise in the x-right, y-up coordinate system
@@ -89,34 +137,7 @@ public interface Vec2 extends GenericVec<Vec2> {
 
 	@Override
 	default VecN asUnknownSize() {
-		return new VecN() {
-			@Override
-			public int size() {
-				return 2;
-			}
-
-			@Override
-			public double get(int i) {
-				assert i < size();
-
-				return i == 0 ? x() : y();
-			}
-
-			@Override
-			public Vec2 asVec2() {
-				return Vec2.this;
-			}
-
-			@Override
-			public ArrayVecN asArrayBacked() {
-				return Vec2.this.asArrayBacked().asUnknownSize();
-			}
-
-			@Override
-			public String toString() {
-				return Vec2.this.toString();
-			}
-		};
+		return new Vec2Wrapper.BasicToVecN(this);
 	}
 
 	/**
@@ -124,22 +145,30 @@ public interface Vec2 extends GenericVec<Vec2> {
 	 * @return a rotation
 	 */
 	default Rot2 asRot() {
-		return new Rot2() {
-			@Override
-			public double x() {
-				return Vec2.this.x();
-			}
+		return new Vec2Wrapper.BasicToRot2(this);
+	}
 
-			@Override
-			public double y() {
-				return Vec2.this.y();
-			}
-		};
+	/**
+	 * Returns this vector as a complex number
+	 * @return a complex number of the form {@code y + i × x}
+	 */
+	default Complex asComplex() {
+		return new Vec2Wrapper.BasicToComplex(this);
 	}
 
 	@Override
 	default ArrayVec2 asArrayBacked() {
 		return (ArrayVec2) GenericVec.super.asArrayBacked();
+	}
+
+	@Override
+	default Matrix asRow() {
+		return asColumn().transpose();
+	}
+
+	@Override
+	default Matrix asColumn() {
+		return new Vec2Wrapper.BasicToMatrix(this);
 	}
 
 	@Override

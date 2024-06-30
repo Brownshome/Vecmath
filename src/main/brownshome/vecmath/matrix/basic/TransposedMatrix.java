@@ -1,7 +1,5 @@
 package brownshome.vecmath.matrix.basic;
 
-import java.util.Objects;
-
 import brownshome.vecmath.matrix.MMatrix;
 import brownshome.vecmath.matrix.Matrix;
 import brownshome.vecmath.vector.VecN;

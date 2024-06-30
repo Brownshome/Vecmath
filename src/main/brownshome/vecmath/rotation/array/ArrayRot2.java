@@ -7,8 +7,8 @@ import brownshome.vecmath.vector.layout.Vec2Layout;
 
 public interface ArrayRot2 extends MRot2, ArrayVec2 {
 	@Override
-	default MRot2 asRot() {
-		return MRot2.super.asRot();
+	default ArrayRot2 asRot() {
+		return (ArrayRot2) MRot2.super.asRot();
 	}
 
 	@Override

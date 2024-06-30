@@ -1,10 +1,10 @@
 package brownshome.vecmath.vector.layout;
 
+import brownshome.vecmath.basic.layout.BasicColumnLayout;
 import brownshome.vecmath.matrix.basic.layout.VecNMatrixLayout;
 import brownshome.vecmath.matrix.layout.MatrixLayout;
-import brownshome.vecmath.vector.basic.layout.BasicVecNLayout;
-import brownshome.vecmath.vector.basic.layout.WrappedVecLayout;
 import brownshome.vecmath.vector.generic.GenericVecLayout;
+import brownshome.vecmath.vector.wrapped.layout.WrappedVecLayout;
 
 /**
  * The layout of an array-backed arbitrary-element vector
@@ -46,7 +46,7 @@ public interface VecNLayout extends GenericVecLayout {
 	 * @return a layout
 	 */
 	static VecNLayout of(int size, int offset, int stride) {
-		return new BasicVecNLayout(size, offset, stride);
+		return new BasicColumnLayout(size, offset, stride);
 	}
 
 	/**
@@ -59,7 +59,7 @@ public interface VecNLayout extends GenericVecLayout {
 	 * This layout as a Vec2 layout if it only has 2 elements.
 	 * @return a layout
 	 */
-	default Vec2Layout asVec2Layout() {
+	default Vec2Layout asVec2() {
 		assert elements() == 2;
 
 		return new WrappedVecLayout(this);
@@ -69,7 +69,7 @@ public interface VecNLayout extends GenericVecLayout {
 	 * This layout as a Vec3 layout if it only has 3 elements.
 	 * @return a layout
 	 */
-	default Vec3Layout asVec3Layout() {
+	default Vec3Layout asVec3() {
 		assert elements() == 3;
 
 		return new WrappedVecLayout(this);
@@ -79,7 +79,7 @@ public interface VecNLayout extends GenericVecLayout {
 	 * This layout as a Vec4 layout if ti only has 4 elements.
 	 * @return a layout
 	 */
-	default Vec4Layout asVec4Layout() {
+	default Vec4Layout asVec4() {
 		assert elements() == 4;
 
 		return new WrappedVecLayout(this);

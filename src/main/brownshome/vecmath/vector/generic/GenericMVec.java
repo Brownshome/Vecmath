@@ -2,7 +2,6 @@ package brownshome.vecmath.vector.generic;
 
 import brownshome.vecmath.generic.GenericMElement;
 import brownshome.vecmath.matrix.MMatrix;
-import brownshome.vecmath.matrix.Matrix;
 import brownshome.vecmath.vector.MVecN;
 
 /**
@@ -11,7 +10,6 @@ import brownshome.vecmath.vector.MVecN;
  * @param <VEC_TYPE> the type of this vector
  */
 public interface GenericMVec<VEC_TYPE extends GenericVec<VEC_TYPE>> extends GenericMElement<VEC_TYPE>, GenericVec<VEC_TYPE> {
-
 	/**
 	 * Sets this vector to the normal. The results are undefined if the length is zero
 	 */
@@ -24,11 +22,11 @@ public interface GenericMVec<VEC_TYPE extends GenericVec<VEC_TYPE>> extends Gene
 
 	@Override
 	default MMatrix asRow() {
-		return GenericVec.super.asRow().move();
+		return (MMatrix) GenericVec.super.asRow();
 	}
 
 	@Override
 	default MMatrix asColumn() {
-		return GenericVec.super.asColumn().move();
+		return (MMatrix) GenericVec.super.asColumn();
 	}
 }
